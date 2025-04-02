@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Floor Layout</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .room:hover {
+      transform: scale(1.05);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding-top: 60px;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 5% auto;
+      /* Centers the modal vertically */
+      padding: 15px;
+      /* Reduce padding */
+      border: 1px solid #888;
+      width: 50%;
+      /* Adjust the width (default is 80%) */
+      border-radius: 10px;
+      /* Rounded corners */
+      max-width: 400px;
+      /* Optional: Set a maximum width */
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #6c34a3;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #563080;
+    }
+
+    #scheduleContent {
+      margin-top: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="floor-buttons">
+      <a href="floor2.html"><button>ชั้น 2</button></a>
+      <a href="floor3.html"><button>ชั้น 3</button></a>
+      <button>ชั้น 4</button>
+    </div>
+    <div class="report-buttons">
+      <a href="user_requests_InTime.html"><button>คำร้องขอใช้งานห้อง</button></a>
+      <a href="request_crash_equipments.html"><button>รายงานอุปกรณ์ชำรุด</button></a>
+    </div>
+    <div class="logout-button">
+      <button onclick="logout()" class="btn btn-warning">ออกจากระบบ</button></div>
+    </div>
+  </header>
+  <main>
+    <div class="layout">
+      <div class="room vertical" id="SC2-411" onclick="manageRoom('SC2-411')">SC2-411</div>
+      <div class="room large" id="SC2-412">SC2-412</div>
+      <div class="room small" id="sc2-413">sc2-413</div>
+      <div class="room large1" id="sc2-414" onclick="manageRoom('sc2-414')">sc2-414</div>
+      <div class="room vertical1" id="sc2-415" onclick="manageRoom('sc2-415')">SC2-415</div>
+      <div class="room small1">sc2-416</div>
+      <div class="room small2">sc2-416</div>
+      <div class="room vertical2">SC2-417</div>
+      <div class="room small3">sc2-418</div>
+      <div class="room small4">sc2-418</div>
+      <div class="room vertical1Down">sc2-410</div>
+      <div class="room vertical1Down">ห้องสุขา หญิง</div>
+      <div class="room vertical1Down">ห้องสุขา ชาย</div>
+      <div class="room smallDown">sc2-409</div>
+      <div class="room largeDown1">sc2-408</div>
+      <div class="room largeDown2" id="sc2-407" onclick="manageRoom('sc2-407')">sc2-407</div>
+    </div>
+
+    <!-- Modal (Popup) -->
+    <div id="roomModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="roomDetailTitle">Room Details</h2>
+        <button id="roomDetailsButton">รายละเอียดภายในห้อง</button>
+        <button id="scheduleButton">ตารางการใช้ห้อง</button>
+        <div>
+          <label for="status">สถานะห้อง :</label>
+          <select id="status">
+            <option value="available">เปิดการใช้งาน</option>
+            <option value="not-available">ปิดการใช้งาน</option>
+          </select>
+        </div>
+        <button id="saveStatus">Save Status</button>
+      </div>
+    </div>
+    </div>
+    <script src="../script/config.js"></script>
+    <script>
+      // Modal and Room Elements
+      const modal = document.getElementById("roomModal");
+      const closeModal = document.querySelector(".close");
+      const saveStatusButton = document.getElementById("saveStatus");
+      const statusSelect = document.getElementById("status");
+      const roomDetailTitle = document.getElementById("roomDetailTitle");
+      const roomDetailsButton = document.getElementById("roomDetailsButton");
+
+      let currentRoomElement = null; // Track the current room being edited
+
+      // Function to manage the room details
+      function manageRoom(roomId) {
+        // ตรวจสอบว่าค่า roomId ถูกส่งเข้ามาหรือไม่
+        console.log("roomId ที่ถูกคลิก:", roomId);
+
+        // ดึง element ที่มี id เป็น roomId
+        currentRoomElement = document.getElementById(roomId);
+
+        // ตรวจสอบค่าของ roomId ที่ถูกคลิก
+        const roomName = currentRoomElement.innerText;
+
+        // ตั้งชื่อหัวข้อ
+        roomDetailTitle.innerText = `รายละเอียดห้อง: ${roomName}`;
+
+        // โหลดตารางการใช้งาน (สามารถเพิ่มฟังก์ชัน loadSchedule ตามต้องการ)
+        // loadSchedule(roomId);
+
+        // ค้นหาสถานะปัจจุบันของห้อง
+        const currentStatus = currentRoomElement.classList.contains('available') ? 'available' : 'not-available';
+        statusSelect.value = currentStatus === 'available' ? 'available' : 'not-available';
+
+        // แสดง modal
+        modal.style.display = "block";
+
+        // กำหนด action ให้กับปุ่ม scheduleButton สำหรับแต่ละห้อง
+        const scheduleButton = document.getElementById("scheduleButton");
+
+        // กำหนด URL ของ schedule สำหรับห้องต่างๆ
+        if (roomId === 'sc2-414') {
+          scheduleButton.onclick = () => window.location.href = "Schedule414.html";
+        }
+        if (roomId === 'sc2-407') {
+          scheduleButton.onclick = () => window.location.href = "Schedule407.html";
+        }
+        if (roomId === 'SC2-411') {
+          scheduleButton.onclick = () => window.location.href = "Schedule411.html";
+        }
+        if (roomId === 'sc2-415') {
+          scheduleButton.onclick = () => window.location.href = "Schedule415.html";
+        }
+
+        const roomPage = "Room_Detail.html";
+
+        // ทำให้ roomId เป็นตัวพิมพ์เล็กทั้งหมดก่อนแทนที่
+        const numericId = roomId.toLowerCase().replace("sc2-", "").replace("sc2-", "");
+
+        // ตรวจสอบห้องที่มีข้อมูล
+        const roomIdsForDetails = ['407', '411', '414', '415'];
+
+        document.getElementById("roomDetailsButton").onclick = function () {
+          // ถ้าห้องนี้มีรายละเอียด ให้เปลี่ยนหน้าด้วยการส่งค่า roomId
+          if (roomIdsForDetails.includes(numericId)) {
+            window.location.href = `${roomPage}?room=${numericId}`;
+          } else {
+            alert("ไม่มีข้อมูลสำหรับห้องนี้");
+          }
+        };
+      }
+
+      // Save the room status and update the room element
+      saveStatusButton.onclick = async function () {
+        const selectedStatus = statusSelect.value;
+
+        // เปลี่ยน class เพื่อแสดงผลหน้า UI
+        if (selectedStatus === "available") {
+          currentRoomElement.classList.add("available");
+          currentRoomElement.classList.remove("not-available", "closed");
+        } else if (selectedStatus === "not-available") {
+          currentRoomElement.classList.add("not-available");
+          currentRoomElement.classList.remove("available", "closed");
+        } else if (selectedStatus === "closed") {
+          currentRoomElement.classList.add("closed");
+          currentRoomElement.classList.remove("available", "not-available");
+        }
+
+        // 🟢 เรียก API ไปยัง backend เพื่ออัปเดต room_status
+        const roomName = currentRoomElement.innerText.split(" ")[0]; // เช่น SC2-307
+        const statusText =
+          selectedStatus === "available"
+            ? "เปิดการใช้งาน"
+            : "ปิดการใช้งาน";
+
+        try {
+          const res = await fetch(`${CONFIG.API_URL}/updateRoomStatus`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              room_name: roomName,
+              room_status: statusText,
+            }),
+          });
+
+          const result = await res.json();
+          if (res.ok) {
+            alert("✅ อัปเดตสถานะห้องสำเร็จ");
+          } else {
+            alert("❌ อัปเดตไม่สำเร็จ: " + result.message);
+          }
+        } catch (err) {
+          console.error("❌ Error:", err);
+          alert("เกิดข้อผิดพลาด");
+        }
+
+        modal.style.display = "none";
+      };
+
+
+      // Close the modal
+      closeModal.onclick = function () {
+        modal.style.display = "none";
+      };
+
+      // Close the modal if clicked outside of it
+      window.onclick = function (event) {
+        if (event.target === modal) {
+          modal.style.display = "none";
+        }
+      };
+
+      // Load room status from localStorage when the page reloads
+      window.onload = async function () {
+        try {
+          const response = await fetch(`${CONFIG.API_URL}/getRoomStatuses`);
+          const roomStatuses = await response.json();
+
+          const rooms = document.querySelectorAll(".room");
+
+          rooms.forEach(room => {
+            const roomName = room.id.toUpperCase();
+            const statusData = roomStatuses.find(r => r.room_name.toUpperCase() === roomName);
+
+            if (statusData) {
+              room.classList.remove("available", "not-available", "closed");
+
+              if (statusData.room_status === "เปิดการใช้งาน") {
+                room.classList.add("available");
+              } else if (statusData.room_status === "ปิดการใช้งาน") {
+                room.classList.add("not-available");
+              } else if (statusData.room_status === "ซ่อมบำรุง") {
+                room.classList.add("closed");
+                if (!room.innerText.includes("ซ่อมบำรุง")) {
+                  room.innerText += " (ซ่อมบำรุง)";
+                }
+              }
+            }
+          });
+        } catch (err) {
+          console.error("❌ ไม่สามารถโหลดสถานะห้องจากฐานข้อมูลได้:", err);
+        }
+      };
+
+
+
+      // อ้างอิงถึง search input และ reports container
+      const searchInput = document.getElementById("searchInput");
+      const reportsContainer = document.querySelector(".reports");
+      const reportItems = document.querySelectorAll(".report");
+
+      // เพิ่ม event listener สำหรับการค้นหา
+      searchInput.addEventListener("input", function () {
+        const query = searchInput.value.toLowerCase();
+
+        reportItems.forEach((report) => {
+          const reportText = report.textContent.toLowerCase();
+
+          // แสดงเฉพาะรายการที่ตรงกับคำค้นหา
+          if (reportText.includes(query)) {
+            report.style.display = "block";
+          } else {
+            report.style.display = "none";
+          }
+        });
+      });
+    </script>
+    <script>
+      const categories = document.querySelectorAll(".categories li");
+      const reports = document.querySelectorAll(".reports .report");
+
+      // Add click event listener to each category item
+      categories.forEach((category) => {
+        category.addEventListener("click", () => {
+          // Toggle active class on the category
+          category.classList.toggle("active");
+
+          // Get the category ID from data-category attribute
+          const categoryId = category.getAttribute("data-category");
+
+          // Show or hide reports based on the clicked category
+          reports.forEach((report) => {
+            if (report.getAttribute("data-category") === categoryId) {
+              // Toggle visibility of the selected category reports
+              if (category.classList.contains("active")) {
+                report.style.display = "block"; // Show the report
+              } else {
+                report.style.display = "none"; // Hide the report
+              }
+            } else {
+              // Always hide reports that don't match the selected category
+              report.style.display = "none";
+            }
+          });
+        });
+      });
+    </script>
+    <script src="logout.js"></script>
+    <!-- <script src="CheckStatus.js"></script> -->
+     <script src="../script/auth.js"></script>
+</body>
+
+</html>

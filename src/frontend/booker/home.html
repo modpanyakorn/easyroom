@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EasyRoom Reservation System - หน้าหลัก</title>
+    <!-- Bootstrap 5 Bundle CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link href="styles.css" rel="stylesheet" />
+    <!-- SweetAlert2 CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+      }
+      .header {
+        background-color: #e54715;
+        padding: 15px;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .header-title {
+        font-size: 25px;
+        font-weight: bold;
+      }
+      .nav {
+        display: flex;
+        gap: 20px;
+      }
+      .nav a {
+        color: white;
+        text-decoration: none;
+        font-size: 20px;
+      }
+      .nav a:hover {
+        text-decoration: underline;
+      }
+      .nav a.active {
+        font-weight: bold;
+        text-decoration: underline;
+      }
+      .logout-btn {
+        background-color: #5e1d78;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .logout-btn:hover {
+        background-color: #4b1561;
+      }
+      .user-info {
+        background-color: #ffffff;
+        margin: 0;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 400px;
+        max-width: 500px;
+        flex-shrink: 0;
+      }
+      .user-avatar {
+        font-size: 50px;
+        margin-right: 20px;
+      }
+      .user-details div {
+        margin-bottom: 8px;
+      }
+      .booking-section {
+        background-color: #8e44ad;
+        color: white;
+        margin: 5px 0;
+        padding: 20px;
+        border-radius: 10px;
+        width: 100%;
+        max-width: none;
+        box-sizing: border-box;
+      }
+      .booking-section h3 {
+        margin-top: 0;
+        font-size: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: white;
+        color: black;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      table th,
+      table td {
+        text-align: left;
+        padding: 10px;
+        border-bottom: 1px solid black;
+      }
+      table th {
+        background-color: #dcdde1;
+        color: #2c3e50;
+        z-index: 2;
+        position: sticky;
+        top: 0;
+      }
+      table tr:nth-child(even) {
+        background-color: #f2f2f2;
+      }
+      .table-container {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      .status {
+        color: green;
+        font-weight: bold;
+      }
+      .cancel-btn {
+        background-color: red;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .cancel-btn:hover {
+        background-color: darkred;
+      }
+      /* Modal Styling */
+      #detailsModal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        width: 50%;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        z-index: 1000;
+      }
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+      }
+      .modal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 40%;
+        max-width: 500px;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        z-index: 1000;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        text-align: center;
+      }
+      .modal h3 {
+        margin-top: 0;
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+      }
+      .close {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 32px;
+        font-weight: bold;
+        color: rgb(0, 0, 0);
+        background: none;
+        border: none;
+        cursor: pointer;
+      }
+      .close:hover {
+        color: red;
+      }
+      .modal img {
+        width: 100%;
+        max-width: 400px;
+        margin-top: 10px;
+        border-radius: 10px;
+      }
+      .details-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 15px;
+      }
+      .details-row {
+        display: flex;
+        justify-content: space-between;
+        background: #f5f5f5;
+        padding: 10px;
+        border-radius: 5px;
+      }
+      #repair-table-body tr {
+        border: 1px solid red !important;
+      }
+      .details-row strong {
+        color: #333;
+      }
+      .detail-btn {
+        background-color: #007bff;
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .detail-btn:hover {
+        background-color: #0056b3;
+      }
+      #rejectModal.modal {
+        display: none;
+        position: fixed;
+        top: 12 px;
+        left: 16 px;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px 37px;
+        border-radius: 12px;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        width: auto;
+        min-width: 250px;
+        max-width: 90vw;
+        max-height: 80vh;
+        overflow-y: auto;
+        height: auto;
+      }
+      #rejectModal h3 {
+        margin-top: 0;
+        font-size: 22px;
+        font-weight: bold;
+        text-align: center;
+        color: #333;
+      }
+      #rejectContent {
+        text-align: left;
+        font-size: 16px;
+        line-height: 1.6;
+        margin-top: 15px;
+        color: #444;
+      }
+      #rejectModal .close {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        font-size: 32px;
+        font-weight: bold;
+        color: #333;
+        background: none;
+        border: none;
+        cursor: pointer;
+      }
+      #rejectModal .close:hover {
+        color: red;
+      }
+      .main-layout {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        padding: 20px;
+      }
+      .content-sections {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      @media screen and (max-width: 992px) {
+        .main-layout {
+          flex-direction: column;
+        }
+        .user-info {
+          width: 100%;
+          margin-right: 0;
+          margin-bottom: 20px;
+        }
+        .content-sections {
+          width: 100%;
+        }
+      }
+      .menu-toggle {
+        font-size: 24px;
+        background: none;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      .mobile-popup-menu {
+        position: absolute;
+        top: 60px;
+        right: 15px;
+        background-color: white;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        display: none;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 1000;
+      }
+      .mobile-popup-menu a {
+        color: #333;
+        text-decoration: none;
+      }
+      .mobile-popup-menu a:hover {
+        text-decoration: underline;
+      }
+      table tbody tr {
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        cursor: pointer;
+      }
+      table tbody tr:hover {
+        background-color: #e9f5ff !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      #bookingDetailsModal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        width: 600px;
+        max-width: 90vw;
+        padding: 30px;
+        border-radius: 15px;
+        z-index: 1001;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-dark" style="background-color: #e54715">
+      <div
+        class="container-fluid d-flex justify-content-between align-items-center"
+      >
+        <span class="navbar-brand fw-bold text-white"
+          >EasyRoom Reservation System</span
+        >
+        <!-- ปุ่มสามขีด (เฉพาะมือถือ) -->
+        <button class="menu-toggle d-lg-none" onclick="toggleMobileMenu()">
+          ☰
+        </button>
+        <!-- เมนูหลัก (แสดงเฉพาะจอใหญ่) -->
+        <div class="d-none d-lg-flex gap-3 align-items-center">
+          <a class="nav-link text-white active" href="#">หน้าหลัก</a>
+          <a class="nav-link text-white" href="Floor2.html">จองห้อง</a>
+          <a class="nav-link text-white" href="repost.html">รายงาน</a>
+          <button class="logout-btn ms-3" onclick="logout()">ออกจากระบบ</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- เมนูเล็กแบบลอย สำหรับมือถือ -->
+    <div id="mobilePopupMenu" class="mobile-popup-menu d-lg-none">
+      <a href="#">หน้าหลัก</a>
+      <a href="Floor2.html">จองห้อง</a>
+      <a href="repost.html">รายงาน</a>
+      <button class="logout-btn mt-2" onclick="logout()">ออกจากระบบ</button>
+    </div>
+
+    <div class="main-layout">
+      <!-- ซ้าย: user info -->
+      <div class="user-info">
+        <div class="user-avatar">😊</div>
+        <div class="user-details">
+          <div>ชื่อ นามสกุล: <span id="student-name">กำลังโหลด...</span></div>
+          <div>รหัสประจำตัว: <span id="student-id">กำลังโหลด...</span></div>
+          <div>ชั้นปี: <span id="stud-year">กำลังโหลด...</span></div>
+          <div>คณะ: <span id="faculty">กำลังโหลด...</span></div>
+          <div>สาขา: <span id="department">กำลังโหลด...</span></div>
+        </div>
+      </div>
+
+      <!-- ขวา: section ทั้งสอง -->
+      <div class="content-sections">
+        <!--รายละเอียดการจอง-->
+        <section class="booking-section">
+          <h3>รายละเอียดการจอง</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ประเภท</th>
+                  <th>ห้องที่จอง</th>
+                  <th>วันที่ดำเนินการ</th>
+                  <th>วันที่ใช้</th>
+                  <th>เวลาเริ่ม</th>
+                  <th>เวลาสิ้นสุด</th>
+                  <th>สถานะ</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="booking-table-body"></tbody>
+            </table>
+            <button id="load-more-btn" class="btn-load-more">
+              แสดงเพิ่มเติม
+            </button>
+          </div>
+        </section>
+
+        <!--รายงานปัญหา-->
+        <section class="booking-section">
+          <h3>รายงานปัญหา</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>เวลาที่แจ้งซ่อม</th>
+                  <th>ชื่ออุปกรณ์</th>
+                  <th>รายละเอียด</th>
+                  <th>ห้อง</th>
+                  <th>ผู้รับแจ้งซ่อม</th>
+                  <th>สถานะ</th>
+                  <th>เพิ่มเติม</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="repair-table-body"></tbody>
+            </table>
+            <button class="btn-load-more">แสดงเพิ่มเติม</button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Overlay -->
+    <div
+      id="modalOverlay"
+      class="modal-overlay"
+      onclick="closeDetailsModal()"
+    ></div>
+    <div id="detailsModal" class="modal">
+      <span class="close" onclick="closeDetailsModal()">&times;</span>
+      <h3 id="modalTitle">รายละเอียดการแจ้งซ่อม</h3>
+      <div id="modalContent">
+        <div id="imageContainer" class="image-container"></div>
+        <div id="detailsContainer" class="details-container"></div>
+      </div>
+    </div>
+
+    <!-- Modal สำหรับแสดงหมายเหตุ -->
+    <div id="rejectModal" class="modal">
+      <span class="close" onclick="closeRejectModal()">&times;</span>
+      <h3>รายละเอียด</h3>
+      <div id="rejectContent" class="details-container"></div>
+    </div>
+
+    <!-- Bootstrap 5 JavaScript Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../script/config.js"></script>
+    <script src="../script/auth.js"></script>
+    <script src="script/home.js"></script>
+  </body>
+</html>
