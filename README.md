@@ -29,8 +29,9 @@ docker-compose down
 
 for Docker Container Service we set directory path frontend deployment to `src/frontend` directory
 
-- Port `5501`: Apache Web Server serving the EasyRoom application.
-- Port `8000`: phpMyAdmin for managing the MySQL database.
+- Port `5501`: `Apache Web Server` serving the EasyRoom application.
+- Port `8000`: `phpMyAdmin` for managing the MySQL database.
+- Port `3000`: Running `Express` Backend Server.
 
 Example: "Open Login Page"
 
@@ -45,17 +46,21 @@ easyroom-reservation/
 ├── docker-compose.yml
 ├── Dockerfile
 ├── easyroom.sql
+├── .gitignore
 └── src/
     ├── frontend/
+    │   └── index.html (Login file)
     │   └── booker/
     │   └── admin/
     │   └── executive/
-    │   └── index.html (Login file)
     │   └── script/
     │       └── auth.js (Sessions checking)
     │       └── config.js (Frontend config, API URL, ...)
     │
     └── backend/
+        ├── .env (Backend config, API HOST, API PORT, DB HOST, ...)
+        ├── package.json
+        ├── server.js (Collect All Routing Path API)
         ├── certificate/
         ├── core/
         │   └── auth/ (Sessions orchestration)
@@ -64,10 +69,8 @@ easyroom-reservation/
         │   └── booker/
         │   └── admin/
         │   └── executive/
-        ├── storage/
-        │   └── equipment_img/
-        ├── package.json
-        └── server.js (Collect All Routing Path API)
+        └── storage/
+            └── equipment_img/
 ```
 
 ### Configuration
