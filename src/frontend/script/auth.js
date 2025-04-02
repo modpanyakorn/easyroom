@@ -77,13 +77,13 @@ function redirectToHome() {
 
   const role = currentUser.role;
   if (role === "นิสิต") {
-    window.location.href = "/booker/student_home.html";
+    window.location.href = "../booker/home.html";
   } else if (role === "อาจารย์") {
-    window.location.href = "/booker/teacher_home.html";
+    window.location.href = "../booker/home.html";
   } else if (role === "ผู้ดูแลห้อง") {
-    window.location.href = "/admin/admin_home.html";
+    window.location.href = "../admin/index.html";
   } else if (role === "ผู้บริหาร") {
-    window.location.href = "/executive/executive_home.html";
+    window.location.href = "../executive/index.html";
   }
 }
 
