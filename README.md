@@ -69,8 +69,8 @@ easyroom-reservation/
         │   └── executive/
         ├── storage/
         │   └── equipment_img/
-        └── .env (Backend config, API HOST, API PORT, DB HOST, ...)
-        └── package.json
+        ├── .env (Backend config, API HOST, API PORT, DB HOST, ...)
+        ├── package.json
         └── server.js (Collect All Routing Path API)
 ```
 
