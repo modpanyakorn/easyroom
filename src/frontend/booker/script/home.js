@@ -11,117 +11,46 @@ window.addEventListener("click", function (e) {
   }
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-  let visibleRows = 10;
-  const increment = 5;
-  let tableRows;
-  function updateTableVisibility() {
-    let tableRows = document.querySelectorAll("#booking-table-body tr");
-    tableRows.forEach((row, index) => {
-      row.style.display = index < visibleRows ? "table-row" : "none";
+async function fetchUserInfo() {
+  try {
+    const response = await fetch(`${API_URL}/auth/session`, {
+      method: "GET",
+      credentials: "include",
     });
-    document.getElementById("load-more-btn").style.display =
-      visibleRows >= tableRows.length ? "none" : "block";
-  }
-  document
-    .getElementById("load-more-btn")
-    .addEventListener("click", function () {
-      visibleRows += increment;
-      updateTableVisibility();
-    });
-
-  fetchUserBookingData();
-  function formatDate(isoString) {
-    if (!isoString) return "-";
-    return isoString.split("T")[0];
-  }
-
-  async function fetchUserBookingData() {
-    try {
-      console.log("🔍 กำลังโหลดข้อมูลการจอง...");
-      const sessionResponse = await fetch(`${API_URL}/auth/session`, {
-        credentials: "include",
-      });
-      if (!sessionResponse.ok)
-        throw new Error("❌ เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
-      const userSession = await sessionResponse.json();
-      console.log("✅ ข้อมูลเซสชันที่ได้:", userSession);
-      const userId = userSession.data?.user_id;
-      console.log("🎯 userId ที่ใช้เรียก API:", userId);
-      if (!userId) throw new Error("❌ ไม่พบ user_id");
-      const response = await fetch(`${API_URL}/booker/userBookings/${userId}`);
-      if (!response.ok) throw new Error("❌ ไม่สามารถดึงข้อมูลการจองได้");
-      const bookings = await response.json();
-      console.log("✅ ข้อมูลการจองที่ได้รับ:", bookings);
-      const tableBody = document.getElementById("booking-table-body");
-      if (!tableBody) {
-        console.error("❌ ไม่พบ element #booking-table-body");
-        return;
-      }
-      tableBody.innerHTML = "";
-      if (!Array.isArray(bookings) || bookings.length === 0) {
-        console.warn("⚠️ ไม่มีข้อมูลการจอง");
-        tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: red;">ไม่มีข้อมูลการจอง</td></tr>`;
-        return;
-      }
-      bookings.sort(
-        (a, b) => new Date(b.Submitted_date) - new Date(a.Submitted_date)
-      );
-      window.loadedBookingData = bookings;
-      bookings.forEach((booking) => {
-        const row = document.createElement("tr");
-        row.setAttribute("data-id", booking.room_request_id);
-        setTimeout(() => {
-          document.querySelectorAll(".status").forEach((statusCell) => {
-            let statusText = statusCell.textContent.trim();
-            if (statusText === "อนุมัติ") {
-              statusCell.style.color = "green";
-            } else if (
-              statusText === "ไม่อนุมัติ" ||
-              statusText === "ยกเลิกการจอง"
-            ) {
-              statusCell.style.color = "red";
-            } else if (
-              statusText === "รออนุมัติ" ||
-              statusText === "รอดำเนินการ"
-            ) {
-              statusCell.style.color = "orange";
-            }
-          });
-        }, 1000);
-        //console.log("📌 request_status ที่ได้:", booking.request_status);
-        row.innerHTML = `
-          <td>${booking.request_type || "-"}</td>
-          <td>${booking.room_name || "-"}</td>
-          <td>${formatDate(booking.Submitted_date) || "-"}</td>
-          <td>${formatDate(booking.Used_date) || "-"}</td>
-          <td>${booking.start_time || "-"}</td>
-          <td>${booking.end_time || "-"}</td>
-          <td class="status">${booking.request_status || "-"}</td>
-          <td>
-              ${
-                booking.request_status === "รอดำเนินการ" ||
-                booking.request_status === "รออนุมัติ"
-                  ? `<button class="btn cancel-btn btn-sm" onclick="cancelBooking(${booking.room_request_id})">ยกเลิก</button>`
-                  : booking.request_status === "ไม่อนุมัติ"
-                  ? `<button class="btn detail-btn btn-sm" onclick="showRejectNote(${booking.room_request_id}, 'reject')">หมายเหตุ</button>`
-                  : booking.request_status === "อนุมัติ"
-                  ? `<button class="btn detail-btn btn-sm" onclick="showRejectNote(${booking.room_request_id}, 'approve')">หมายเหตุ</button>`
-                  : "-"
-              }
-          </td>
-      `;
-        tableBody.appendChild(row);
-      });
-      updateTableVisibility();
-    } catch (error) {
-      console.error("❌ เกิดข้อผิดพลาด:", error);
-      document.getElementById(
-        "booking-table-body"
-      ).innerHTML = `<tr><td colspan="8" style="text-align: center; color: red;">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>`;
+    if (!response.ok) {
+      throw new Error("Session expired");
     }
+    const userSession = await response.json();
+    console.log("🔍 ข้อมูลที่ได้รับจากเซิร์ฟเวอร์:", userSession);
+    if (!userSession.data) {
+      alert("กรุณาเข้าสู่ระบบใหม่");
+      window.location.href = "../../index.html";
+      return;
+    }
+    document.getElementById("student-name").textContent =
+      userSession.data.full_name;
+    document.getElementById("student-id").textContent =
+      userSession.data.user_id;
+    if (userSession.role === "นิสิต") {
+      document.getElementById("stud-year").textContent =
+        userSession.data.study_year || "-";
+      document.getElementById("faculty").textContent =
+        userSession.data.faculty || "-";
+      document.getElementById("department").textContent =
+        userSession.data.department || "-";
+    } else {
+      document.getElementById("stud-year").parentElement.style.display = "none";
+      document.getElementById("faculty").textContent =
+        userSession.data.faculty || "-";
+      document.getElementById("department").textContent =
+        userSession.data.department || "-";
+    }
+  } catch (error) {
+    console.error("❌ เกิดข้อผิดพลาดในการโหลดข้อมูล:", error);
+    alert("เกิดข้อผิดพลาด กรุณาเข้าสู่ระบบใหม่");
+    window.location.href = "../../index.html";
   }
-});
+}
 
 function convertToThaiTime(utcDate) {
   if (!utcDate) return "-";
@@ -129,6 +58,7 @@ function convertToThaiTime(utcDate) {
   date.setHours(date.getHours() + 7);
   return date.toISOString().slice(0, 10);
 }
+
 function showRejectNote(requestId, mode = "reject") {
   const bookings = window.loadedBookingData || [];
   const booking = bookings.find((b) => b.room_request_id === requestId);
@@ -163,6 +93,7 @@ function showRejectNote(requestId, mode = "reject") {
   document.getElementById("rejectModal").style.display = "block";
   document.getElementById("modalOverlay").style.display = "block";
 }
+
 function closeRejectModal() {
   document.getElementById("rejectModal").style.display = "none";
   document.getElementById("modalOverlay").style.display = "none";
@@ -227,6 +158,7 @@ async function cancelBooking(requestId) {
     });
   }
 }
+
 async function fetchBrokenEquipments() {
   try {
     console.log("🔍 เรียก API /getBrokenEquipments...");
@@ -252,7 +184,7 @@ async function fetchBrokenEquipments() {
       console.log(`📌 เพิ่มแถวที่ ${index + 1}:`, item);
       const row = document.createElement("tr");
       row.innerHTML = `
-                <td>${new Date(item.repair_date).toLocaleString("th-TH")}</td>
+      <td>${new Date(item.repair_date).toLocaleString("th-TH")}</td>
                 <td>${item.equipment_name || "-"}</td>
                 <td>${item.damage_details || "-"}</td>
                 <td>${item.room_id || "-"}</td>
@@ -260,7 +192,7 @@ async function fetchBrokenEquipments() {
                 <td class="status">${item.repair_status || "-"}</td>
                 <td>
                     <button class="detail-btn" onclick="showDetails(${index}, 'repair')">รายละเอียด</button>
-                </td>
+                    </td>
             `;
       tableBody.appendChild(row);
     });
@@ -270,7 +202,7 @@ async function fetchBrokenEquipments() {
     console.error("❌ เกิดข้อผิดพลาดในการโหลดข้อมูล:", error);
   }
 }
-document.addEventListener("DOMContentLoaded", fetchBrokenEquipments);
+
 function showDetails(index, type) {
   const modalTitle = document.getElementById("modalTitle");
   const detailsContainer = document.getElementById("detailsContainer");
@@ -291,11 +223,11 @@ function showDetails(index, type) {
       : "";
     modalTitle.innerText = "รายละเอียดการแจ้งซ่อม";
     detailsContent = `
-          ${
-            imageUrl
-              ? `<img src="${imageUrl}" alt="ภาพอุปกรณ์ที่เสียหาย" style="width: 100%; max-width: 400px; border-radius: 8px; margin-top: 10px;">`
-              : ""
-          }
+    ${
+      imageUrl
+        ? `<img src="${imageUrl}" alt="ภาพอุปกรณ์ที่เสียหาย" style="width: 100%; max-width: 400px; border-radius: 8px; margin-top: 10px;">`
+        : ""
+    }
           <p><strong>🖥 ชื่ออุปกรณ์:</strong> ${item.equipment_name || "-"}</p>
           <p><strong>🔍 รายละเอียดเพิ่มเติม:</strong> ${item.damage || "-"}</p>
           <p><strong>🔍 ข้อความเพิ่มเติม:</strong> ${
@@ -322,6 +254,7 @@ function closeDetailsModal() {
   document.getElementById("detailsModal").style.display = "none";
   document.getElementById("rejectModal").style.display = "none";
 }
+
 function openDetailsModal(index) {
   console.log("📌 เปิด Modal สำหรับ index:", index);
   if (!window.brokenEquipmentsData || !window.brokenEquipmentsData[index]) {
@@ -341,19 +274,132 @@ function openDetailsModal(index) {
   const detailsContainer = document.getElementById("detailsContainer");
   detailsContainer.innerHTML = `
       <div class="details-container">
-          <div class="details-row"><strong>ผู้แจ้ง:</strong> ${item.Admin_Name}</div>
+      <div class="details-row"><strong>ผู้แจ้ง:</strong> ${item.Admin_Name}</div>
           <div class="details-row"><strong>เวลาที่แจ้งซ่อม:</strong> ${repairDate}</div>
           <div class="details-row"><strong>ชื่ออุปกรณ์:</strong> ${item.Equipments_name}</div>
           <div class="details-row"><strong>รายละเอียด:</strong> ${item.Damaged_details}</div>
           <div class="details-row"><strong>ห้อง:</strong> SC2-${item.Rooms_ID}</div>
           <div class="details-row"><strong>ผู้รับแจ้งซ่อม:</strong> ${item.Admin_Name}</div>
           <div class="details-row"><strong>สถานะ:</strong> ${item.Repair_status}</div>
-      </div>
-    `;
+          </div>
+          `;
   console.log("📌 HTML ที่จะถูกแสดงใน Modal:", detailsContainer.innerHTML);
   document.getElementById("modalOverlay").style.display = "block";
   document.getElementById("detailsModal").style.display = "block";
 }
-window.onload = function () {
+
+function formatDate(isoString) {
+  if (!isoString) return "-";
+  return isoString.split("T")[0];
+}
+
+async function fetchUserBookingData() {
+  try {
+    console.log("🔍 กำลังโหลดข้อมูลการจอง...");
+    const sessionResponse = await fetch(`${API_URL}/auth/session`, {
+      credentials: "include",
+    });
+    if (!sessionResponse.ok)
+      throw new Error("❌ เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
+    const userSession = await sessionResponse.json();
+    console.log("✅ ข้อมูลเซสชันที่ได้:", userSession);
+    const userId = userSession.data?.user_id;
+    console.log("🎯 userId ที่ใช้เรียก API:", userId);
+    if (!userId) throw new Error("❌ ไม่พบ user_id");
+    const response = await fetch(`${API_URL}/booker/userBookings/${userId}`);
+    if (!response.ok) throw new Error("❌ ไม่สามารถดึงข้อมูลการจองได้");
+    const bookings = await response.json();
+    console.log("✅ ข้อมูลการจองที่ได้รับ:", bookings);
+    const tableBody = document.getElementById("booking-table-body");
+    if (!tableBody) {
+      console.error("❌ ไม่พบ element #booking-table-body");
+      return;
+    }
+    tableBody.innerHTML = "";
+    if (!Array.isArray(bookings) || bookings.length === 0) {
+      console.warn("⚠️ ไม่มีข้อมูลการจอง");
+      tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: red;">ไม่มีข้อมูลการจอง</td></tr>`;
+      return;
+    }
+    bookings.sort(
+      (a, b) => new Date(b.Submitted_date) - new Date(a.Submitted_date)
+    );
+    window.loadedBookingData = bookings;
+    bookings.forEach((booking) => {
+      const row = document.createElement("tr");
+      row.setAttribute("data-id", booking.room_request_id);
+      setTimeout(() => {
+        document.querySelectorAll(".status").forEach((statusCell) => {
+          let statusText = statusCell.textContent.trim();
+          if (statusText === "อนุมัติ") {
+            statusCell.style.color = "green";
+          } else if (
+            statusText === "ไม่อนุมัติ" ||
+            statusText === "ยกเลิกการจอง"
+          ) {
+            statusCell.style.color = "red";
+          } else if (
+            statusText === "รออนุมัติ" ||
+            statusText === "รอดำเนินการ"
+          ) {
+            statusCell.style.color = "orange";
+          }
+        });
+      }, 1000);
+      //console.log("📌 request_status ที่ได้:", booking.request_status);
+      row.innerHTML = `
+        <td>${booking.request_type || "-"}</td>
+        <td>${booking.room_name || "-"}</td>
+        <td>${formatDate(booking.Submitted_date) || "-"}</td>
+        <td>${formatDate(booking.Used_date) || "-"}</td>
+        <td>${booking.start_time || "-"}</td>
+        <td>${booking.end_time || "-"}</td>
+        <td class="status">${booking.request_status || "-"}</td>
+        <td>
+            ${
+              booking.request_status === "รอดำเนินการ" ||
+              booking.request_status === "รออนุมัติ"
+                ? `<button class="btn cancel-btn btn-sm" onclick="cancelBooking(${booking.room_request_id})">ยกเลิก</button>`
+                : booking.request_status === "ไม่อนุมัติ"
+                ? `<button class="btn detail-btn btn-sm" onclick="showRejectNote(${booking.room_request_id}, 'reject')">หมายเหตุ</button>`
+                : booking.request_status === "อนุมัติ"
+                ? `<button class="btn detail-btn btn-sm" onclick="showRejectNote(${booking.room_request_id}, 'approve')">หมายเหตุ</button>`
+                : "-"
+            }
+        </td>
+    `;
+      tableBody.appendChild(row);
+    });
+    updateTableVisibility();
+  } catch (error) {
+    console.error("❌ เกิดข้อผิดพลาด:", error);
+    document.getElementById(
+      "booking-table-body"
+    ).innerHTML = `<tr><td colspan="8" style="text-align: center; color: red;">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>`;
+  }
+}
+
+function updateTableVisibility() {
+  let visibleRows = 8;
+  const increment = 5;
+  let tableRows = document.querySelectorAll("#booking-table-body tr");
+  tableRows.forEach((row, index) => {
+    row.style.display = index < visibleRows ? "table-row" : "none";
+  });
+  document.getElementById("load-more-btn").style.display =
+    visibleRows >= tableRows.length ? "none" : "block";
+  document
+    .getElementById("load-more-btn")
+    .addEventListener("click", function () {
+      visibleRows += increment;
+      updateTableVisibility();
+    });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  fetchUserBookingData();
+  fetchUserInfo();
   fetchBrokenEquipments();
-};
+});
+
+window.onload = function () {};
