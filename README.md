@@ -47,6 +47,7 @@ easyroom-reservation/
 ├── Dockerfile
 ├── easyroom.sql (Backup DataBase)
 ├── .gitignore
+├── .env (Docker config)
 └── src/
     ├── frontend/
     │   └── index.html (Login file)
