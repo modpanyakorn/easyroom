@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+    <title>Floor Layout</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #d9c1ab;
+        }
+
+        header {
+            background-color: #d9c1ab;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 2px solid #000;
+        }
+
+        .floor-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .floor-buttons button {
+            background-color: #6c34a3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .floor-buttons button:hover {
+            background-color: #563080;
+        }
+
+        main {
+            display: flex;
+            flex: 1;
+        }
+
+        .layout {
+            flex: 3;
+            background-color: white;
+            display: grid;
+            grid-template-columns: repeat(13, 1fr);
+            grid-template-rows: repeat(7, 1fr);
+            gap: 1px;
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 50px);
+            overflow: auto;
+            box-sizing: border-box;
+            padding: 20px;
+            border-bottom-left-radius: 10px;
+            border-top-left-radius: 10px;
+        }
+
+        .room {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            text-align: center;
+            border: 2px solid #000;
+            border-radius: 10px;
+            background-color: #ff0000;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .room.red {
+            pointer-events: none;
+        }
+
+        .room:hover {
+            transform: scale(1.05);
+        }
+
+        .room.large {
+            position: relative;
+            grid-column: 6 / span 2;
+            grid-row: 1 / span 2;
+
+        }
+
+        .room.small {
+            position: relative;
+            grid-column: 5 / span 2;
+            grid-row: 1 / span 2;
+        }
+
+        .room.large.sc2-308 {
+            grid-column: 8 / span 2;
+            grid-row: 1 / span 2;
+        }
+
+        .room.vertical_1 {
+            grid-row: span 2;
+        }
+
+        .room.vertical_2 {
+            grid-row: span 2;
+            grid-column: 11;
+        }
+
+        .room.vertical_3 {
+            grid-row: span 2;
+            grid-column: 12;
+        }
+
+        .room.vertical_4 {
+            grid-row: span 2;
+            grid-column: 13;
+        }
+
+        .room.vertical_5 {
+            grid-row: 6 / span 2;
+            grid-column: 1 / span 1;
+        }
+
+        .room.vertical_6 {
+            grid-row: 6 / span 2;
+            grid-column: 2 / span 1;
+        }
+
+        .room.vertical_7 {
+            grid-row: 6 / span 2;
+            grid-column: 3 / span 1;
+        }
+
+        .room.vertical_8 {
+            grid-row: 6 / span 2;
+            grid-column: 5 / span 1;
+        }
+
+        .room.vertical_9 {
+            grid-row: 6 / span 2;
+            grid-column: 6 / span 1;
+        }
+
+        .room.vertical_10.room.large.sc2-313 {
+            grid-column: 7 / span 2;
+            grid-row: 6 / span 2;
+
+        }
+
+        .room.vertical_11.room.large.sc2-311 {
+            grid-column: 11 / span 3;
+            grid-row: 6 / span 2;
+
+        }
+
+        .sidebar {
+            flex: 1;
+            background-color: #f8f9fa;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid #000;
+            border-bottom-right-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .reports {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            text-align: left;
+            /* จัดข้อความชิดซ้าย */
+        }
+
+        .report-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            /* เพิ่มช่องว่างระหว่างไอคอนกับข้อความ */
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 20px;
+            background-color: #fff;
+            text-align: left;
+            /* จัดข้อความชิดซ้าย */
+        }
+
+        .report {
+            background-color: #fff3cd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ffeeba;
+            border-radius: 5px;
+            border: 1px solid #000000;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #6c34a3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #563080;
+        }
+
+        .icon {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 18px;
+            color: rgb(0, 0, 0);
+            flex-shrink: 0;
+        }
+
+        .icon-red {
+            background-color: red;
+        }
+
+        .icon-green {
+            background-color: green;
+        }
+
+
+        .header {
+            background-color: #e54715;
+            padding: 15px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 20px;
+        }
+
+        .nav a:hover {
+            text-decoration: underline;
+        }
+
+        .nav a.active {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        .logout-btn {
+            background-color: #5e1d78;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background-color: #4b1561;
+        }
+
+
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .floor-selector {
+            margin-bottom: 20px;
+        }
+
+        .floor-selector button {
+            background-color: #a569bd;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px 10px;
+        }
+
+        .floor-selector button:hover {
+            background-color: #512e5f;
+        }
+
+        .floor-selector button.active {
+            background-color: #6c3483;
+        }
+
+        .disabled-room {
+            pointer-events: none;
+            /* ป้องกันการกด */
+            cursor: not-allowed;
+            /* เปลี่ยนเมาส์เป็น "ห้าม" */
+        }
+
+        .stair,
+        .elevator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            border: 2px solid #000;
+            border-radius: 10px;
+            background-color: #e9e9e9;
+            color: rgb(0, 0, 0);
+
+        }
+
+        .hall {
+            grid-column: 3 / span 9;
+            grid-row: 4 / span 1;
+            background-color: #ffffff;
+            border: 2px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #000;
+            border-radius: 10px;
+        }
+
+        .sc1-down {
+            grid-column: 4;
+            grid-row: 7;
+            background-color: #f5b041;
+            border: 2px dashed #000;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: black;
+            font-weight: bold;
+        }
+
+        .room-type-icon {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            font-size: 16px;
+            color: black;
+        }
+
+        .room {
+            position: relative;
+        }
+
+        .status {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 50%;
+            background-color: green;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 30px;
+            height: 30px;
+        }
+
+        .room-type-icon {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            font-size: 16px;
+            color: black;
+        }
+
+        .room {
+            position: relative;
+        }
+
+        .status {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 50%;
+            background-color: green;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 30px;
+            height: 30px;
+        }
+
+        .status.not {
+            background-color: red;
+        }
+
+        /* สำหรับปุ่มเมนูบนมือถือ */
+        .menu-toggle {
+            font-size: 24px;
+            background: none;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        
+        /* สำหรับเมนูแบบ popup บนมือถือ */
+        .mobile-popup-menu {
+            position: absolute;
+            top: 60px;
+            right: 15px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+        
+        .mobile-popup-menu a {
+            color: #333;
+            text-decoration: none;
+        }
+        
+        .mobile-popup-menu a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 992px) {
+            .layout {
+              grid-template-columns: repeat(6, 1fr);
+              overflow-x: auto;
+            }
+            
+            .sidebar {
+              flex-direction: row;
+              overflow-x: auto;
+              padding: 10px;
+            }
+            
+            .report-item {
+              min-width: 200px;
+            }
+          }
+    </style>
+</head>
+
+<body>
+    <!-- แทนที่ header แบบเดิม -->
+<nav class="navbar navbar-dark" style="background-color: #e54715;">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+      <span class="navbar-brand fw-bold text-white">EasyRoom Reservation System</span>
+  
+      <!-- ปุ่มสามขีด (เฉพาะมือถือ) -->
+      <button class="menu-toggle d-lg-none" onclick="toggleMobileMenu()">☰</button>
+  
+      <!-- เมนูหลัก (แสดงเฉพาะจอใหญ่) -->
+      <div class="d-none d-lg-flex gap-3 align-items-center">
+        <a class="nav-link text-white" href="home.html">หน้าหลัก</a>
+        <a class="nav-link text-white active" href="Floor2.html">จองห้อง</a>
+        <a class="nav-link text-white" href="repost.html">รายงาน</a>
+        <button class="logout-btn ms-3" onclick="logout()">ออกจากระบบ</button>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- เมนูเล็กแบบลอย สำหรับมือถือ -->
+  <div id="mobilePopupMenu" class="mobile-popup-menu d-lg-none">
+    <a href="home.html">หน้าหลัก</a>
+    <a href="Floor2.html">จองห้อง</a>
+    <a href="repost.html">รายงาน</a>
+    <button class="logout-btn mt-2" onclick="logout()">ออกจากระบบ</button>
+  </div>
+    <div class="content">
+        <div class="floor-selector">
+            <!-- เมื่อกดปุ่มจะไปเปิดไฟล์ Floor*.html -->
+            <button onclick="window.location.href='Floor2.html'">ชั้น 2</button>
+            <button onclick="window.location.href='Floor3.html'" class="floor-btn active">ชั้น 3</button>
+            <button onclick="window.location.href='Floor4.html'">ชั้น 4</button>
+            <main>
+                <div class="layout">
+                    <div class="room red vertical_1" data-room="304">SC2-304</div>
+                    <div class="room red vertical_1" data-room="305">SC2-305</div>
+                    <div class="room red vertical_1" data-room="306">SC2-306</div>
+                    <div class="elevator" style="grid-column: 4; grid-row: 1;"><i class="fas fa-elevator"></i></div>
+                    <div class="stair" style="grid-column: 5; grid-row: 1;"><i class="fas fa-stairs"></i></div>
+
+                    <div class="room large available" data-room="307">SC2-307</div>
+                    <div class="room large sc2-308 available" data-room="308">SC2-308</div>
+
+                    <div class="stair" style="grid-column: 10; grid-row: 1;"><i class="fas fa-stairs"></i></div>
+                    <div class="hall">โถงกลาง</div>
+                    <div class="room red vertical_2" data-room="309">SC2-309</div>
+                    <div class="room red vertical_3">ห้องน้ำ</div>
+                    <div class="room red vertical_4">ห้องน้ำ</div>
+                    <div class="room red vertical_5" data-room="301">SC2-301</div>
+                    <div class="room red vertical_6" data-room="302">SC2-302</div>
+                    <div class="room red vertical_7" data-room="303">SC2-303</div>
+                    <div class="room sc1-down disabled-room">
+                        ↓<br>SC1
+                    </div>
+                    <div class="room red vertical_8" data-room="314">SC2-314</div>
+                    <div class="room vertical_9 small available" data-room="313-1">SC2-313-1</div>
+                    <div class="room vertical_10 room large sc2-313 available" data-room="313">SC2-313</div>
+
+                    <div class="stair" style="grid-column: 9; grid-row: 7;"><i class="fas fa-stairs"></i></div>
+
+                    <div class="room vertical_11 room large sc2-311 available" data-room="311">SC2-311<br>(Co-working
+                        Space)</div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="reports">
+                        <div class="report-item">
+                            <span class="icon icon-red"></i></span> <!-- ไอคอนจองไม่ได้ -->
+                            <span>จองไม่ได้</span>
+                        </div>
+                        <div class="report-item">
+                            <span class="icon icon-green"></i></span> <!-- ไอคอนจองได้ -->
+                            <span>จองได้</span>
+                        </div>
+                        <div class="report-item">
+                            <span class="icon"><i class="fas fa-chalkboard-teacher"></i></span>
+                            <!-- ไอคอนห้องเล็กเชอร์ -->
+                            <span>ห้องเล็กเชอร์</span>
+                        </div>
+                        <div class="report-item">
+                            <span class="icon"><i class="fas fa-laptop-code"></i></span> <!-- ไอคอนห้องปฏิบัติการ -->
+                            <span>ห้องปฏิบัติการ</span>
+                        </div>
+                        <div class="report-item">
+                            <span class="icon"><i class="fas fa-users"></i></span> <!-- ไอคอนห้องประชุม -->
+                            <span>ห้องประชุม</span>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        function toggleMobileMenu() {
+          const menu = document.getElementById("mobilePopupMenu");
+          menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+        }
+      
+        // คลิกข้างนอกเมนูแล้วให้เมนูหายไป
+        window.addEventListener("click", function(e) {
+          const menu = document.getElementById("mobilePopupMenu");
+          const button = document.querySelector(".menu-toggle");
+      
+          if (!menu.contains(e.target) && !button.contains(e.target)) {
+            menu.style.display = "none";
+          }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../script/config.js"></script>
+    <script src="../script/auth.js"></script>
+    <script src="script/BookScript.js"></script>
+
+</body>
+
+</html>
