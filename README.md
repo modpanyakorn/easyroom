@@ -45,7 +45,7 @@ localhost:5501
 easyroom-reservation/
 ├── docker-compose.yml
 ├── Dockerfile
-├── easyroom.sql
+├── easyroom.sql (Backup DataBase)
 ├── .gitignore
 └── src/
     ├── frontend/
