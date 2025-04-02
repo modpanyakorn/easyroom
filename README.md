@@ -59,10 +59,7 @@ easyroom-reservation/
     │       └── config.js (Frontend config, API URL, ...)
     │
     └── backend/
-        └── .env (Backend config, API HOST, API PORT, DB HOST, ...)
-        └── package.json
-        └── server.js (Collect All Routing Path API)
-        └── certificate/
+        ├── certificate/
         ├── core/
         │   └── auth/ (Sessions orchestration)
         │   └── db.js (DataBase connection)
@@ -70,8 +67,11 @@ easyroom-reservation/
         │   └── booker/
         │   └── admin/
         │   └── executive/
-        └── storage/
-            └── equipment_img/
+        ├── storage/
+        │   └── equipment_img/
+        └── .env (Backend config, API HOST, API PORT, DB HOST, ...)
+        └── package.json
+        └── server.js (Collect All Routing Path API)
 ```
 
 ### Configuration
