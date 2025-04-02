@@ -245,3 +245,46 @@ exports.getComputerManagement = async (req, res) => {
     res.json(results);
   });
 };
+
+exports.getRoomDetail = async (req, res) => {
+  const query = `
+    SELECT
+      rli.room_name AS full_name,
+      rli.floor,
+      rli.room_id,
+      rli.room_name,
+      rt.type_name AS room_type, --
+      SUM(CASE WHEN rlr.request_status = 'อนุมัติ' THEN 1 ELSE 0 END) AS Approved_Count
+    FROM room rli
+    LEFT JOIN room_request rlr ON rli.room_id = rlr.room_id
+    LEFT JOIN room_type rt ON rli.room_type_id = rt.room_type_id -- 
+    GROUP BY rli.room_id, rli.room_name, rli.floor, rli.room_name
+    ORDER BY Approved_Count DESC;
+  `;
+
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error("❌ เกิดข้อผิดพลาด:", err);
+
+      res.status(500).send(err);
+
+      return;
+    }
+
+    console.log("✅ ดึงข้อมูลห้องสำเร็จ:", results);
+
+    res.json(results);
+  });
+};
+
+exports.getRooms = async (req, res) => {
+  try {
+    const [results] = await connection
+      .promise()
+      .query("SELECT room_id, room_name, room_status FROM room");
+    res.json(results);
+  } catch (err) {
+    console.error("❌ เกิดข้อผิดพลาดในการดึงข้อมูลห้อง:", err);
+    res.status(500).json({ error: "ไม่สามารถดึงข้อมูลห้องได้" });
+  }
+};
