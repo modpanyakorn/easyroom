@@ -18,6 +18,12 @@ router.get("/getRoomId", controller.getRoomId);
 router.get("/getComputersByRoom", controller.getComputersByRoom);
 router.get("/getEquipmentId", controller.getEquipmentId);
 router.get("/getLatestRepairNumber", controller.getRepairNumber);
+router.get("/getSchedule", controller.getSchedule);
+router.get("/room_request", controller.getRoomRequest);
+router.get("/computer_management", controller.getComputerManagement);
+router.get("/getEquipments", controller.getEquipments);
+router.get("/getEquipmentInformation", controller.getEquipmentInformation);
+router.post("/submitBookingIntime", controller.submitBookingIntime);
 // เพิ่มได้เรื่อย ๆ
 // ✅ ใส่ multer middleware ให้ route นี้!
 
