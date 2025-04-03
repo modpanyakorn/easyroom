@@ -198,6 +198,7 @@ async function fetchBrokenEquipments() {
     });
     window.brokenEquipmentsData = brokenEquipments;
     console.log("✅ ตารางอัปเดตเรียบร้อย!");
+    setupReportTable(4, 5);
   } catch (error) {
     console.error("❌ เกิดข้อผิดพลาดในการโหลดข้อมูล:", error);
   }
@@ -370,7 +371,7 @@ async function fetchUserBookingData() {
     `;
       tableBody.appendChild(row);
     });
-    updateTableVisibility();
+    setupBookingTable(4, 5);
   } catch (error) {
     console.error("❌ เกิดข้อผิดพลาด:", error);
     document.getElementById(
@@ -379,21 +380,52 @@ async function fetchUserBookingData() {
   }
 }
 
-function updateTableVisibility() {
-  let visibleRows = 8;
-  const increment = 5;
-  let tableRows = document.querySelectorAll("#booking-table-body tr");
-  tableRows.forEach((row, index) => {
-    row.style.display = index < visibleRows ? "table-row" : "none";
-  });
-  document.getElementById("load-more-btn").style.display =
-    visibleRows >= tableRows.length ? "none" : "block";
-  document
-    .getElementById("load-more-btn")
-    .addEventListener("click", function () {
-      visibleRows += increment;
-      updateTableVisibility();
+// เพิ่มการมองเห็นในแต่ละแถวของตาราง รายละเอียดการจอง
+function setupBookingTable(initialVisible, increment) {
+  let visibleRows = initialVisible;
+
+  const loadMoreBtn = document.getElementById("load-more-btn-booking");
+  const tableRows = document.querySelectorAll("#booking-table-body tr");
+
+  function updateTable() {
+    tableRows.forEach((row, index) => {
+      row.style.display = index < visibleRows ? "table-row" : "none";
     });
+
+    loadMoreBtn.style.display =
+      visibleRows >= tableRows.length ? "none" : "block";
+  }
+
+  loadMoreBtn.addEventListener("click", function () {
+    visibleRows += increment;
+    updateTable();
+  });
+
+  updateTable(); // แสดงรอบแรก
+}
+
+// เพิ่มการมองเห็นในแต่ละแถวของตาราง รายละเอียดการรายงานอุปกรณ์
+function setupReportTable(initialVisible, increment) {
+  let visibleRows = initialVisible;
+
+  const loadMoreBtn = document.getElementById("load-more-btn-report");
+  const tableRows = document.querySelectorAll("#repair-table-body tr");
+
+  function updateTable() {
+    tableRows.forEach((row, index) => {
+      row.style.display = index < visibleRows ? "table-row" : "none";
+    });
+
+    loadMoreBtn.style.display =
+      visibleRows >= tableRows.length ? "none" : "block";
+  }
+
+  loadMoreBtn.addEventListener("click", function () {
+    visibleRows += increment;
+    updateTable();
+  });
+
+  updateTable(); // แสดงรอบแรก
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -401,5 +433,3 @@ document.addEventListener("DOMContentLoaded", function () {
   fetchUserInfo();
   fetchBrokenEquipments();
 });
-
-window.onload = function () {};
