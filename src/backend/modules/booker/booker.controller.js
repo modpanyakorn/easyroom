@@ -1,6 +1,8 @@
 const connection = require("../../core/db");
 const path = require("path");
 const fs = require("fs");
+const multer = require("multer");
+const express = require("express");
 
 exports.getUserBookings = async (req, res) => {
   const { userId } = req.params;
@@ -286,5 +288,276 @@ exports.getRooms = async (req, res) => {
   } catch (err) {
     console.error("❌ เกิดข้อผิดพลาดในการดึงข้อมูลห้อง:", err);
     res.status(500).json({ error: "ไม่สามารถดึงข้อมูลห้องได้" });
+  }
+};
+
+// ส่วนการ upload รูปภาพอุปกรณ์ที่เสีย
+// โฟลเดอร์เก็บไฟล์อัปโหลด
+const uploadDir = path.join(__dirname, "../../storage/equipment_img");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// ตั้งค่าการเก็บไฟล์
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const userId = req.body.sessionUserId; // 65312994
+    const nextNum = req.body.nextNumber; // 1
+    const ext = path.extname(file.originalname).toLowerCase();
+
+    if (!userId || !nextNum) {
+      return cb(null, "equip_" + Date.now() + ext);
+    }
+
+    // สร้างชื่อไฟล์ => "65312994_1.jpg"
+    const finalName = `${userId}_${nextNum}${ext}`;
+    cb(null, finalName);
+  },
+});
+
+// ตรวจสอบชนิดไฟล์รูปภาพ
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = /jpeg|jpg|png|gif/;
+  const extName = allowedTypes.test(
+    path.extname(file.originalname).toLowerCase()
+  );
+  const mimeType = allowedTypes.test(file.mimetype);
+
+  if (extName && mimeType) {
+    return cb(null, true);
+  } else {
+    return cb(
+      new Error("❌ อัปโหลดได้เฉพาะไฟล์รูปภาพเท่านั้น (jpeg, jpg, png, gif)")
+    );
+  }
+};
+
+// ตั้งค่า Multer Middleware
+const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }, // จำกัดขนาดไฟล์ 5MB
+});
+exports.upload = upload; // 👉 export multer instance เพื่อใช้ใน routes
+
+// API อัปโหลดไฟล์รูป
+exports.uploadReportImage = (req, res) => {
+  try {
+    console.log("📌 ตรวจสอบไฟล์ที่ได้รับ:", req.file);
+    console.log("📌 ค่า req.body:", req.body);
+
+    if (!req.file) {
+      console.log("❌ ไม่พบไฟล์ที่อัปโหลด");
+      return res
+        .status(400)
+        .json({ error: "❌ กรุณาเลือกไฟล์ที่ต้องการอัปโหลด" });
+    }
+
+    console.log("✅ ไฟล์ที่อัปโหลดสำเร็จ:", req.file.filename);
+    res.json({
+      message: "✅ อัปโหลดไฟล์สำเร็จ",
+      filePath: `/storage/equipment_img/${req.file.filename}`,
+    });
+  } catch (err) {
+    console.error("❌ เกิดข้อผิดพลาดในการอัปโหลด:", err);
+    res.status(500).json({ error: "❌ เกิดข้อผิดพลาดในการอัปโหลด" });
+  }
+};
+
+// บันทึกการรายงานปัญหา (reportIssue)
+exports.reportIssue = async (req, res) => {
+  try {
+    let {
+      repair_number,
+      repair_date,
+      student_id,
+      teacher_id,
+      room_id,
+      equipment_id,
+      computer_id, // เพิ่มการรับ computer_id
+      damage,
+      damage_details,
+      repair_status,
+      image_path,
+    } = req.body;
+
+    console.log("📌 Debug: ค่า request ที่รับมา:", req.body);
+
+    if (
+      !repair_number ||
+      !room_id ||
+      !equipment_id ||
+      (!student_id && !teacher_id)
+    ) {
+      console.error("❌ ข้อมูลที่ส่งมาไม่ครบ!");
+      return res
+        .status(400)
+        .json({ error: "ข้อมูลไม่ครบ กรุณากรอกข้อมูลให้ครบถ้วน" });
+    }
+
+    let repairDate = new Date(repair_date);
+    repairDate.setHours(repairDate.getHours() + 14);
+    let repair_date_formatted = repairDate
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+
+    let lastNumber = repair_number.split("-").pop();
+    let new_image_filename = `${student_id || teacher_id}_${lastNumber}.jpg`;
+
+    console.log("✅ ค่าที่จะบันทึกลง DB:", {
+      repair_number,
+      repair_date_formatted,
+      student_id,
+      teacher_id,
+      room_id,
+      equipment_id,
+      computer_id, // ข้อมูล computer_id
+      new_image_filename,
+    });
+
+    const sql = `
+      INSERT INTO equipment_brokened (
+        repair_number, repair_date, student_id, teacher_id, room_id, equipment_id, computer_id, admin_id, damage, damage_details, image_path, repair_status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      repair_number,
+      repair_date_formatted,
+      student_id || null,
+      teacher_id || null,
+      room_id,
+      equipment_id,
+      computer_id || null, // ใส่ computer_id ในคำสั่ง SQL
+      null,
+      damage,
+      damage_details || null,
+      new_image_filename,
+      repair_status || "รอซ่อม",
+    ];
+
+    await connection.promise().query(sql, values);
+    console.log("✅ Insert สำเร็จ:", repair_number);
+
+    res.json({
+      message: "✅ รายงานปัญหาสำเร็จ!",
+      image_path: new_image_filename,
+    });
+  } catch (err) {
+    console.error("❌ เกิดข้อผิดพลาดใน /reportIssue:", err);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการบันทึกข้อมูล" });
+  }
+};
+
+// ดึง room_id จาก room_name
+exports.getRoomId = async (req, res) => {
+  const { name } = req.query;
+  try {
+    console.log(`📌 กำลังค้นหา room_id สำหรับห้อง: '${name}'`);
+
+    if (!name) {
+      console.error("❌ ไม่ได้รับค่าห้อง (name)");
+      return res.status(400).json({ error: "Missing 'name' in request query" });
+    }
+
+    const [rows] = await connection
+      .promise()
+      .execute("SELECT room_id FROM room WHERE room_name = ?", [name]);
+
+    console.log("🔹 ผลลัพธ์จากฐานข้อมูล:", rows);
+    if (rows.length > 0) {
+      console.log(`✅ พบ room_id: ${rows[0].room_id}`);
+      res.json({ room_id: rows[0].room_id });
+    } else {
+      console.warn(`⚠️ ไม่พบห้อง '${name}' ในฐานข้อมูล`);
+      res.status(404).json({ error: "Room not found" });
+    }
+  } catch (error) {
+    console.error("❌ Error fetching room ID:", error);
+    res
+      .status(500)
+      .json({ error: "Internal Server Error", details: error.message });
+  }
+};
+
+// ดูคอมพิวเตอร์ในแต่ละห้องหน้ารายงาน
+exports.getComputersByRoom = async (req, res) => {
+  const { room_id } = req.query;
+
+  if (!room_id) {
+    return res.status(400).json({ error: "กรุณาระบุ room_id" });
+  }
+
+  try {
+    const [results] = await connection
+      .promise()
+      .query("SELECT computer_id FROM computer_management WHERE room_id = ?", [
+        room_id,
+      ]);
+
+    if (results.length === 0) {
+      return res.json({ computers: [] }); // ถ้าไม่มีคอมพิวเตอร์ในห้องนี้
+    }
+
+    res.json({ computers: results });
+  } catch (err) {
+    console.error("❌ เกิดข้อผิดพลาดในการดึงข้อมูลคอมพิวเตอร์:", err);
+    res.status(500).json({ error: "ดึงข้อมูลล้มเหลว" });
+  }
+};
+
+// ดึง ID ของอุปกรณ์จากชื่อ (getEquipmentId)
+exports.getEquipmentId = (req, res) => {
+  const { name } = req.query;
+  if (!name) {
+    return res.status(400).json({ error: "Missing 'name' in request query" });
+  }
+  console.log("📌 Searching for equipment:", name);
+
+  connection.query(
+    "SELECT equipment_id FROM equipment WHERE equipment_name = ? LIMIT 1",
+    [name],
+    (error, results) => {
+      if (error) {
+        console.error("❌ Error fetching equipment:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+      if (results.length > 0) {
+        res.json({ equipment_id: results[0].equipment_id });
+      } else {
+        res.status(404).json({ error: "ไม่พบอุปกรณ์" });
+      }
+    }
+  );
+};
+
+// getLatestRepairNumber (API generate reapair_number)
+exports.getRepairNumber = async (req, res) => {
+  try {
+    // สมมติไม่ต้องมีเงื่อนไขใด ๆ
+    const sql = "SELECT repair_number FROM equipment_brokened";
+    const [rows] = await connection.promise().query(sql);
+
+    if (rows.length === 0) {
+      return res.json({ latest_number: 0 });
+    } else {
+      let maxNum = 0;
+      rows.forEach((row) => {
+        const parts = row.repair_number.split("-");
+        const lastString = parts[parts.length - 1];
+        const num = parseInt(lastString, 10);
+        if (!isNaN(num) && num > maxNum) {
+          maxNum = num;
+        }
+      });
+      return res.json({ latest_number: maxNum });
+    }
+  } catch (error) {
+    console.error("❌ Error:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };

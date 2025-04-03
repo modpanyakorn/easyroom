@@ -2,6 +2,8 @@ require("dotenv").config();
 const listEndpoints = require("express-list-endpoints");
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
+const fs = require("fs");
 const session = require("express-session");
 const http = require("http");
 const { Server } = require("socket.io");
@@ -40,6 +42,14 @@ app.use(
     },
   })
 );
+
+// โฟลเดอร์เก็บรูป
+const uploadDir = path.join(__dirname, "./storage/equipment_img");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+// ให้ Express ให้บริการไฟล์รูปแบบ Static
+app.use("/storage/equipment_img", express.static(uploadDir));
 
 // Routes
 app.use("/auth", require("./core/auth/auth.routes"));
