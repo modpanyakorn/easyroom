@@ -4,7 +4,6 @@ const controller = require("./executive.controller");
 
 
 
-router.get("/equipment_brokenedd", controller.getEquipment_brokened);
 router.get("/brokendEquipment",controller.brokendEquipment);
 router.get("/borrowEquipment" , controller.borrowEquipment);
 router.get("/mostroomalldata", controller.mostroomalldata);
