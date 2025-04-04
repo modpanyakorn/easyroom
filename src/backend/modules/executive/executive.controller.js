@@ -271,7 +271,7 @@ exports.equipment = async (req, res) => {
 };
 exports.getImage = async (req, res) => {
     const filename = req.params.filename;
-    const filePath = path.join(__dirname, "../storage/equipment_img", filename);
+    const filePath = path.join(__dirname, "../../storage/equipment_img", filename);
   
     if (fs.existsSync(filePath)) {
       res.setHeader("Content-Type", "image/jpeg");
