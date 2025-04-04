@@ -1,20 +1,24 @@
-const connection = require("../../core/db");
-const path = require("path");
-const fs = require("fs");
-const multer = require("multer");
-const express = require("express");
 
-// exports.rooms = async (req,res) =>{
-//     connection.query('SELECT * FROM Equipments_list_brokened', (err, results) => {
-//         if (err) {
-//             console.error('❌ เกิดข้อผิดพลาด:', err);
-//             res.status(500).send(err);
-//             return;
-//         }
-//         console.log('✅ ดึงข้อมูลสำเร็จ:', results);
-//         res.json(results);
-//     });
-// };
+const express = require("express");
+const connection = require("./db"); // นำเข้าการเชื่อมต่อฐานข้อมูล
+const mysql = require("mysql2");
+const fs = require("fs");
+const cors = require("cors"); // เพิ่ม cors
+const { error } = require("console");
+const util = require("util");
+const path = require("path");
+
+exports.getEquipment_brokened = (req, res) => {
+    connection.query("SELECT * FROM equipment_brokened", (err, results) => {
+      if (err) {
+        console.error("❌ Error:", err);
+        res.status(500).send(err);
+        return;
+      }
+      console.log("✅ ดึงข้อมูลสำเร็จจาก equipment_brokened:", results);
+      res.json(results);
+    });
+  };
 exports.brokendEquipment = async  (req, res) => {
     connection.query(`SELECT e.equipment_name as name , COUNT(eb.equipment_id) as total  FROM equipment_brokened as eb 
 JOIN equipment as e ON e.equipment_id = eb.equipment_id
@@ -766,4 +770,5 @@ exports.submitRejection = async (req, res) => {
         }
         res.json({ message: '✅ บันทึกเหตุผลการไม่อนุมัติสำเร็จ' });
     });
+
 };

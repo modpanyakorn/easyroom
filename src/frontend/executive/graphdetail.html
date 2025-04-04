@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ประวัติการใช้ห้อง</title>
+  <link rel="stylesheet" href="detailstyle.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .sidebar {
+      background-color: #f0d3b8;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 290px;
+      padding: 20px;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+
+    .content-area {
+      margin-left: 290px;
+      padding: 20px;
+      background-color: #f8f9fa;
+    }
+
+    @media (max-width: 576px) {
+      .sidebar {
+        width: 100%;
+        box-shadow: none;
+      }
+      .content-area {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="sidebar-container"></div>
+
+  <div class="content-area">
+    <div class="container">
+      <header>
+        <h1>ประวัติการใช้ห้อง</h1>
+      </header>
+      <div class="d-flex gap-3 mb-3 align-items-center">
+        <div class="d-flex align-items-center gap-2">
+          <p class="mb-0">Room:</p>
+          <select id="roomFilter" class="form-select w-auto">
+            <option value="all">ทั้งหมด</option>
+          </select>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <p class="mb-0">Role:</p>
+          <select id="roleFilter" class="form-select w-auto">
+            <option value="all">ทั้งหมด</option>
+          </select>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <p class="mb-0">Start Date:</p>
+          <input type="date" id="startDateFilter" class="form-control w-auto">
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <p class="mb-0">End Date:</p>
+          <input type="date" id="endDateFilter" class="form-control w-auto">
+        </div>
+      </div>
+
+      <table id="roomTable" class="display table table-bordered">
+        <thead>
+          <tr>
+            <th>วันที่</th>
+            <th>เวลา</th>
+            <th>ห้อง</th>
+            <th>ชื่อ-นามสกุล</th>
+            <th>อีเมลล์</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <button onclick="window.location.href='dashboard.html'">BACK</button>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script>
+    fetch("sidebar.html")
+    .then(resp => resp.text())
+    .then(html => {
+      document.getElementById("sidebar-container").innerHTML = html;
+      document.getElementById("btnStatistic").classList.add("btn-sidebar-active");
+    })
+    .catch(err => console.error("Failed to load sidebar:", err));
+
+  async function fetchData() {
+    try {
+      const response = await fetch("http://localhost:3000/TableRoomListRequest");
+      const data = await response.json();
+      renderTable(data);
+      populateFilters(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+
+  function renderTable(data) {
+    let table = $('#roomTable').DataTable({
+      destroy: true,
+      data: data,
+      columns: [
+        { data: 'date' },
+        { data: 'time' },
+        { data: 'room' },
+        { data: 'name' },
+        { data: 'email' },
+        { data: 'role' }
+      ],
+      pageLength: 10,
+      searching: true,
+      ordering: true,
+      order:[[0,'desc']],
+      language: {
+        search: "ค้นหา:",
+        lengthMenu: "แสดง _MENU_ รายการ",
+        info: "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
+        paginate: {
+          first: "หน้าแรก",
+          last: "หน้าสุดท้าย",
+          next: "ถัดไป",
+          previous: "ก่อนหน้า"
+        }
+      }
+    });
+
+    // เพิ่ม Custom Filter
+    $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+  let selectedRoom = $('#roomFilter').val();
+  let selectedRole = $('#roleFilter').val();
+  let startDate = $('#startDateFilter').val();
+  let endDate = $('#endDateFilter').val();
+  let room = data[2]; // ห้อง (index 2)
+  let role = data[5]; // สถานะ (index 5)
+  let date = data[0]; // วันที่ (index 0)
+
+  // แปลงวันที่ในข้อมูล (จาก 'วันที่' เป็น 'yyyy-mm-dd')
+  let dataDate = new Date(date).toISOString().split('T')[0]; // 'YYYY-MM-DD'
+
+  let dateMatch = true;
+
+  // กรณี startDate
+  if (startDate) {
+    let start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);  // เริ่มต้นที่เวลา 00:00:00
+    startDate = start.toISOString().split('T')[0]; // แปลงเป็น 'YYYY-MM-DD'
+  }
+
+  // กรณี endDate
+  if (endDate) {
+    // ปรับเวลาให้เป็น 23:59:59.999 เพื่อป้องกันการข้ามวัน
+    let end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);  // สิ้นสุดที่เวลา 23:59:59
+    endDate = end.toISOString().split('T')[0]; // แปลงเป็น 'YYYY-MM-DD'
+  }
+
+  // กรองตามช่วงวันที่
+  if (startDate && endDate) {
+    // กรองตามช่วงวันที่
+    dateMatch = (dataDate >= startDate && dataDate < endDate);
+  } else if (startDate) {
+    // กรองตาม startDate
+    dateMatch = (dataDate >= startDate);
+  } else if (endDate) {
+    // กรองตาม endDate
+    dateMatch = (dataDate < endDate);
+  }
+
+  // กรองตามห้องและสถานะ
+  let roomMatch = (selectedRoom === "all" || room === selectedRoom);
+  let roleMatch = (selectedRole === "all" || role === selectedRole);
+
+  return roomMatch && roleMatch && dateMatch;
+});
+
+    // อัปเดตตารางเมื่อเปลี่ยนค่า
+    $("#roomFilter, #roleFilter, #startDateFilter, #endDateFilter").on("change", function () {
+      $('#roomTable').DataTable().draw();
+    });
+  }
+
+  function populateFilters(data) {
+    let rooms = new Set();
+    let roles = new Set();
+    data.forEach(item => {
+      rooms.add(item.room);
+      roles.add(item.role);
+    });
+    populateDropdown("roomFilter", rooms);
+    populateDropdown("roleFilter", roles);
+  }
+
+  function populateDropdown(id, items) {
+    let dropdown = document.getElementById(id);
+    dropdown.innerHTML = '<option value="all">ทั้งหมด</option>';
+    items.forEach(item => {
+      let option = document.createElement("option");
+      option.value = item;
+      option.textContent = item;
+      dropdown.appendChild(option);
+    });
+  }
+
+  $(document).ready(function () {
+    fetchData();
+  });
+  </script>
+</body>
+</html>

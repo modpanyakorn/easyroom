@@ -1,0 +1,111 @@
+<!-- sidebar.html -->
+<style>
+  .sidebar {
+    background-color: #f0d3b8;
+    position: fixed; /* ขณะจอกว้างจะ fix ด้านซ้าย */
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 290px;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  }
+
+  /* ปุ่มที่ถูก highlight สีส้ม */
+  .btn-sidebar-active {
+    background-color: orangered !important;
+    color: #fff !important;
+  }
+
+  /* ทำให้ปุ่ม (หรือแท็ก a) ยืดความกว้างเต็ม container */
+  .sidebar .d-grid a {
+    width: 100%;
+  }
+  .sidebar .d-grid a > button {
+    width: 100%;
+  }
+
+  /* Media Query เมื่อจอเล็กลง (ตัวอย่างใช้ 992px) */
+  @media (max-width: 992px) {
+    /* ให้ Sidebar ไม่ fix แล้วกินความกว้างเต็ม (อยู่ด้านบน) */
+    .sidebar {
+      position: static;
+      width: 100%;
+      max-width: none;
+      height: auto;
+    }
+  }
+</style>
+
+<div class="sidebar d-flex flex-column justify-content-between">
+  <div class="d-grid gap-4">
+    <div style="text-align: center">
+      <img
+        style="border-radius: 10px; border: 2px solid white"
+        src="logo.png"
+        alt="logo"
+        width="90px"
+      />
+    </div>
+    <!-- ปุ่มคำขออนุมัติการจองห้อง -->
+    <a href="booking_rooms_requests.html">
+      <button
+        id="btnReceive"
+        class="text-center btn btn-secondary position-relative p-3 text-start"
+        style="font-weight: bold; font-size: 14px"
+      >
+        คำขออนุมัติการจองห้อง
+        <!-- <span
+          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          style="font-size: 12px"
+        >
+          10
+        </span> -->
+      </button>
+    </a>
+
+    <!-- ปุ่มรายการอุปกรณ์ชำรุด -->
+    <a href="crash_equipments_requests.html">
+      <button
+        id="btnBroken"
+        class="text-center btn btn-secondary position-relative p-3 text-start"
+        style="font-weight: bold; font-size: 14px"
+      >
+        รายการอุปกรณ์ชำรุด
+        <!-- <span
+          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger text-white"
+          style="font-size: 12px"
+        >
+          3
+        </span> -->
+      </button>
+    </a>
+
+    <!-- ปุ่มข้อมูลสถิติ -->
+    <a href="dashboard.html">
+      <button
+        id="btnStatistic"
+        class="text-center btn btn-secondary p-3 text-start"
+        style="font-weight: bold; font-size: 14px"
+      >
+        ข้อมูลสถิติ
+      </button>
+    </a>
+  </div>
+
+  <!-- ปุ่มออกจากระบบ -->
+  <div>
+    <button
+      class="btn w-100 p-3"
+      style="
+        background-color: orangered;
+        font-weight: bold;
+        font-size: 20px;
+        color: #fff;
+      "
+    >
+      ออกจากระบบ
+    </button>
+  </div>
+</div>

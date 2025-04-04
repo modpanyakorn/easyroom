@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const controller = require("./executive.controller");
 
+
+
+router.get("/equipment_brokenedd", controller.getEquipment_brokened);
 router.get("/brokendEquipment",controller.brokendEquipment);
 router.get("/borrowEquipment" , controller.borrowEquipment);
 router.get("/mostroomalldata", controller.mostroomalldata);
@@ -35,4 +38,6 @@ router.get("/detailPop",controller.detailsPop);
 router.get("equipment_brokened",controller.equipment_brokened);
 router.get("/RejectReasons",controller.RejectReasons);
 router.get("/submitRejection",controller.submitRejection);
+
 module.exports = router;
+
