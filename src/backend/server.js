@@ -55,7 +55,7 @@ app.use("/storage/equipment_img", express.static(uploadDir));
 app.use("/auth", require("./core/auth/auth.routes"));
 app.use("/booker", require("./modules/booker/booker.routes"));
 app.use("/admin", require("./modules/admin/admin.routes"));
-
+app.use("/executive" ,require("./modules/executive/executive.routes"));
 // list endpoints
 console.log("📚 API Endpoints:");
 console.table(listEndpoints(app));
