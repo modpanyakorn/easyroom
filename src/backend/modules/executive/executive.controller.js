@@ -193,16 +193,64 @@ LEFT JOIN teacher AS t ON rr.teacher_id = t.teacher_id;
         res.json(results);
     });
 };
-exports.useralldata = async (req, res) => {
-    const query = `SELECT 
-    COALESCE(s.full_name, t.full_name) AS name,
-    COUNT(rr.room_request_id) AS stat
-FROM room_request AS rr
-LEFT JOIN student AS s ON rr.student_id = s.student_id
-LEFT JOIN teacher AS t ON rr.teacher_id = t.teacher_id
-GROUP BY name
-ORDER BY stat DESC LIMIT 3 ;
-`
+
+exports.getRoomsAndRoles = async (req, res) => {
+    try {
+        // ดึงข้อมูลห้องจากฐานข้อมูล (ปรับคำสั่ง SQL ให้เหมาะสมกับโครงสร้างฐานข้อมูลของคุณ)
+        const roomsQuery = "SELECT room_id  FROM room_request"; // กรณีนี้สมมติว่าห้องเก็บในตาราง "rooms"
+        
+        connection.query(roomsQuery, (err, results) => {
+            if (err) {
+                console.error("เกิดข้อผิดพลาดในการดึงข้อมูลห้อง:", err);
+                res.status(500).send("ไม่สามารถดึงข้อมูลห้องได้");
+                return;
+            }
+            // ส่งข้อมูลห้องที่ดึงมาใน response
+            res.json({
+                rooms: results,
+            });
+        });
+    } catch (err) {
+        console.error("เกิดข้อผิดพลาดในการดึงข้อมูลห้อง:", err);
+        res.status(500).send("ไม่สามารถดึงข้อมูลห้องได้");
+    }
+};
+
+
+exports.useralldata = async (req, res) => { 
+    const { room, role } = req.query;  // รับค่าฟิลเตอร์จาก query parameters
+    let filter = [];  // ใช้ array เก็บเงื่อนไขกรอง
+
+    // กรองตามบทบาท
+    if (role === "student") {
+        filter.push("rr.student_id IS NOT NULL");
+    } else if (role === "teacher") {
+        filter.push("rr.teacher_id IS NOT NULL");
+    }
+
+    // กรองตามห้อง
+    if (room) {
+        filter.push(`rr.room_id = ${mysql.escape(room)}`);  // กรองห้อง
+    }
+
+    // ถ้ามีเงื่อนไขกรอง ให้เพิ่ม WHERE และตามด้วยเงื่อนไขที่รวมกันจาก array filter
+    const whereClause = filter.length ? "WHERE " + filter.join(" AND ") : "";  // รวมเงื่อนไขที่กรอง
+
+    // SQL query
+    const query = `
+        SELECT 
+            COALESCE(s.full_name, t.full_name) AS name,
+            COUNT(rr.room_request_id) AS stat,
+            rr.room_id AS room
+        FROM room_request AS rr
+        LEFT JOIN student AS s ON rr.student_id = s.student_id
+        LEFT JOIN teacher AS t ON rr.teacher_id = t.teacher_id
+        ${whereClause}  -- ใช้ WHERE clause ที่รวมเงื่อนไขแล้ว
+        GROUP BY name, rr.room_id
+        ORDER BY stat DESC
+        LIMIT 3;
+    `;
+
     connection.query(query, (err, results) => {
         if (err) {
             console.error('❌ เกิดข้อผิดพลาด:', err);
@@ -210,9 +258,12 @@ ORDER BY stat DESC LIMIT 3 ;
             return;
         }
         console.log('✅ ดึงข้อมูลสำเร็จ:', results);
-        res.json(results);
+        res.json(results);  // ส่งข้อมูลที่กรองแล้วกลับไปที่ frontend
     });
 };
+
+
+
 exports.room_request = async (req, res) => {
     connection.query('SELECT * FROM room_request ORDER BY submitted_time ASC', (err, results) => {
         if (err) {
@@ -545,26 +596,41 @@ GROUP BY name, room;
         });
 };
 exports.mostreport = async (req, res) => {
-    const query = `SELECT 
-    COALESCE(s.full_name, t.full_name) AS name,
-    COALESCE(s.student_id,t.teacher_id) as id,
-    COUNT(eb.equipment_id) AS stat
-FROM equipment_brokened AS eb
-LEFT JOIN student AS s ON eb.student_id = s.student_id
-LEFT JOIN teacher AS t ON eb.teacher_id = t.teacher_id
-GROUP BY name,id
-ORDER BY stat DESC LIMIT 3 ;
-`
+    const { role } = req.query;
+    let filter = "";
+  
+    if (role === "student") {
+      filter = "WHERE eb.student_id IS NOT NULL";
+    } else if (role === "teacher") {
+      filter = "WHERE eb.teacher_id IS NOT NULL";
+    }else if (role === ""){
+        filter = "";
+    }
+  
+    const query = 
+      `SELECT 
+        COALESCE(s.full_name, t.full_name) AS name,
+        COALESCE(s.student_id, t.teacher_id) AS id,
+        COUNT(eb.equipment_id) AS stat
+      FROM equipment_brokened AS eb
+      LEFT JOIN student AS s ON eb.student_id = s.student_id
+      LEFT JOIN teacher AS t ON eb.teacher_id = t.teacher_id
+      ${filter}
+      GROUP BY name, id
+      ORDER BY stat DESC
+      LIMIT 3;
+    ;`
+  
     connection.query(query, (err, results) => {
-        if (err) {
-            console.error('❌ เกิดข้อผิดพลาด:', err);
-            res.status(500).send(err);
-            return;
-        }
-        console.log('✅ ดึงข้อมูลสำเร็จ:', results);
-        res.json(results);
+      if (err) {
+        console.error('❌ เกิดข้อผิดพลาด:', err);
+        res.status(500).send(err);
+        return;
+      }
+      console.log('✅ ดึงข้อมูลสำเร็จ:', results);
+      res.json(results);
     });
-};
+  };
 exports.reportTable = async (req, res) => {
     const query = `SELECT
 	COALESCE(s.student_id,t.teacher_id) as id,
