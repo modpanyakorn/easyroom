@@ -7,6 +7,7 @@ router.get("/borrowEquipment" , controller.borrowEquipment);
 router.get("/mostroomalldata", controller.mostroomalldata);
 router.get("/daysroomday",controller.daysroomday);
 router.get("/daysroomweek",controller.daysroomweek);
+router.get("/daysroommount",controller.daysroommount);
 router.get("/daysroomyear",controller.daysroomyear);
 router.get("/useralldata",controller.useralldata);
 router.get("/room_request",controller.room_request);
@@ -35,4 +36,5 @@ router.get("/detailPop",controller.detailsPop);
 router.get("equipment_brokened",controller.equipment_brokened);
 router.get("/RejectReasons",controller.RejectReasons);
 router.get("/submitRejection",controller.submitRejection);
+
 module.exports = router;

@@ -83,7 +83,7 @@ function redirectToHome() {
   } else if (role === "ผู้ดูแลห้อง") {
     window.location.href = "../admin/index.html";
   } else if (role === "ผู้บริหาร") {
-    window.location.href = "../executive/index.html";
+    window.location.href = "../executive/dashboard.html";
   }
 }
 
