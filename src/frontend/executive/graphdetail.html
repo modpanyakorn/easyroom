@@ -96,6 +96,8 @@
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="../script/auth.js"></script>
+  <script src="../script/config.js"></script>
   <script>
     fetch("sidebar.html")
     .then(resp => resp.text())
@@ -107,7 +109,7 @@
 
   async function fetchData() {
     try {
-      const response = await fetch("http://localhost:3000/TableRoomListRequest");
+      const response = await fetch(`${window.CONFIG.API_URL}/executive/TableRoomListRequest`);
       const data = await response.json();
       renderTable(data);
       populateFilters(data);

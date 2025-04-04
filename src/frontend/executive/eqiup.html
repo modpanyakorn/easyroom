@@ -101,7 +101,8 @@
   
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="../script/auth.js"></script>
+<script src="../script/config.js"></script>
   <script>
     // โหลด Sidebar
     fetch("sidebar.html")
@@ -115,7 +116,7 @@
     // โหลดข้อมูลจาก API และอัปเดต DataTable
     async function fetchAndUpdateTable() {
       try {
-        const response = await fetch("http://localhost:3000/DataEquipment");
+        const response = await fetch(`${window.CONFIG.API_URL}/executive/DataEquipment`);
         let data = await response.json();
 
         const selectedRoom = document.getElementById("roomFilter").value;
@@ -168,7 +169,7 @@
 
     async function loadRoomOptions() {
       try {
-        const response = await fetch("http://localhost:3000/DataEquipment");
+        const response = await fetch(`${window.CONFIG.API_URL}/executive/DataEquipment`);
         const data = await response.json();
         const selectElement = document.getElementById("roomFilter");
 
