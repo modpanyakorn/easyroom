@@ -1,14 +1,5 @@
-<<<<<<< HEAD
-const connection = require("../../core/db");
-const path = require("path");
-const fs = require("fs");
-const multer = require("multer");
-const express = require('express');
-=======
->>>>>>> 975886b99b9b0511b59ecb91032847c19cfa6a67
-
 const express = require("express");
-const connection = require("./db"); // นำเข้าการเชื่อมต่อฐานข้อมูล
+const connection = require("../../core/db");
 const mysql = require("mysql2");
 const fs = require("fs");
 const cors = require("cors"); // เพิ่ม cors

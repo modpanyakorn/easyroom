@@ -40,9 +40,4 @@ router.get("equipment_brokened",controller.equipment_brokened);
 router.get("/RejectReasons",controller.RejectReasons);
 router.get("/submitRejection",controller.submitRejection);
 
-<<<<<<< HEAD
 module.exports = router;
-=======
-module.exports = router;
-
->>>>>>> 975886b99b9b0511b59ecb91032847c19cfa6a67
