@@ -152,6 +152,8 @@
         </div>
       </div>
     </div>
+    <script src="../script/auth.js"></script>
+    <script src="../script/config.js"></script>
     <script>
       const currentDate = new Date();
       function toggleCalendar() {
@@ -286,10 +288,10 @@
         try {
           const [roomsRes, studentsRes, teacherRes, partRes] =
             await Promise.all([
-              fetch("http://localhost:3000/room_request"),
-              fetch("http://localhost:3000/student"),
-              fetch("http://localhost:3000/teacher"),
-              fetch("http://localhost:3000/room_request_participant"),
+              fetch(`${window.CONFIG.API_URL}/executive/room_request`),
+              fetch(`${window.CONFIG.API_URL}/executive/student`),
+              fetch(`${window.CONFIG.API_URL}/executive/teacher`),
+              fetch(`${window.CONFIG.API_URL}/executive/room_request_participant`),
             ]);
           const roomsData = await roomsRes.json();
           const studentsData = await studentsRes.json();

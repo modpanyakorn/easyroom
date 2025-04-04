@@ -53,7 +53,7 @@
       }
     </style>
   </head>
-  <body>
+  <>
     <div id="sidebar-container"></div>
     <div class="container">
       <div class="content-area">
@@ -139,6 +139,8 @@
         </div>
       </div>
     </div>
+    <script src="../script/auth.js"></script>
+  <script src="../script/config.js"></script>
     <script>
       function getStatusBadge(status) {
         switch (status) {
@@ -159,11 +161,11 @@
       async function fetchEquipmentTypes() {
         try {
           const brokenResponse = await fetch(
-            "http://localhost:3000/equipment_brokened"
+            `${window.CONFIG.API_URL}/executive/equipment_brokened`
           );
           const brokenData = await brokenResponse.json();
           const equipmentResponse = await fetch(
-            "http://localhost:3000/equipment"
+            `${window.CONFIG.API_URL}/executive/equipment`
           );
           const equipmentData = await equipmentResponse.json();
           const equipmentMap = new Map();
@@ -190,7 +192,7 @@
       async function fetchRoomOptions() {
         try {
           const brokenResponse = await fetch(
-            "http://localhost:3000/equipment_brokened"
+            `${window.CONFIG.API_URL}/executive/equipment_brokened`
           );
           const brokenData = await brokenResponse.json();
           const uniqueRooms = [
@@ -216,10 +218,10 @@
             teachersResponse,
             equipmentsResponse,
           ] = await Promise.all([
-            fetch("http://localhost:3000/equipment_brokened"),
-            fetch("http://localhost:3000/student"),
-            fetch("http://localhost:3000/teacher"),
-            fetch("http://localhost:3000/equipment"),
+            fetch(`${window.CONFIG.API_URL}/executive/equipment_brokened`),
+            fetch(`${window.CONFIG.API_URL}/executive/student`),
+            fetch(`${window.CONFIG.API_URL}/executive/teacher`),
+            fetch(`${window.CONFIG.API_URL}/executive/equipment`),
           ]);
           const brokenData = await brokenResponse.json();
           const studentData = await studentResponse.json();
@@ -249,7 +251,7 @@
               equipmentType: equipment.equipment_type || "ไม่ระบุประเภท",
               damageDetails: item.damage_details || "-",
               imagePath: item.image_path
-                ? `http://localhost:3000/image/${item.image_path}`
+                ? `${window.CONFIG.API_URL}/executive/image/${item.image_path}`
                 : null,
             };
           });
