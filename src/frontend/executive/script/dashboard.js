@@ -93,7 +93,7 @@ fetch(`${window.CONFIG.API_URL}/executive/mostroomalldata`)
   console.error('Error fetching data:', error);
 });
 //doughnutChart
-fetch('http://localhost:3000/borrowEquipment')
+fetch(`${window.CONFIG.API_URL}/executive/borrowEquipment`)
 .then(response => {
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
@@ -134,7 +134,7 @@ fetch('http://localhost:3000/borrowEquipment')
   console.error("❌ Error fetching data:", error);
 });
 //doughtnut2
-fetch('http://localhost:3000/brokendEquipment')
+fetch(`${window.CONFIG.API_URL}/executive/brokendEquipment`)
 .then(response => {
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
@@ -185,10 +185,10 @@ let chartInstance = null; // เก็บ instance ของ Chart เพื่�
 function showChart(timeframe) {
 // ✅ เลือก URL ตามช่วงเวลาที่ต้องการ
 const apiUrls = {
-day: "http://localhost:3000/daysroomday",
-week: "http://localhost:3000/daysroomweek",
-month: "http://localhost:3000/daysroommount",
-year: "http://localhost:3000/daysroomyear"
+day: `${window.CONFIG.API_URL}/executive/daysroomday`,
+week: `${window.CONFIG.API_URL}/executive/daysroomweek`,
+month: `${window.CONFIG.API_URL}/executive/daysroommount`,
+year: `${window.CONFIG.API_URL}/executive/daysroomyear`
 };
 
 const apiUrl = apiUrls[timeframe];
@@ -286,7 +286,7 @@ showChart("day");
 
 //mostuser
 
-fetch("http://localhost:3000/useralldata")
+fetch(`${window.CONFIG.API_URL}/executive/useralldata`)
 .then(response => response.json()) // แปลงเป็น JSON
 .then(data => {
   const userList = document.getElementById("userList");
@@ -304,7 +304,7 @@ fetch("http://localhost:3000/useralldata")
   document.getElementById("userList").innerHTML = "ไม่สามารถโหลดข้อมูลได้";
 });
 
-fetch("http://localhost:3000/mostreport")
+fetch(`${window.CONFIG.API_URL}/executive/mostreport`)
 .then(response => response.json()) // แปลงเป็น JSON
 .then(data => {
   const userList = document.getElementById("ReportList");
@@ -323,7 +323,7 @@ fetch("http://localhost:3000/mostreport")
 });
 
 //most booking room card
-fetch('http://localhost:3000/box1')
+fetch(`${window.CONFIG.API_URL}/executive/box1`)
 .then(response => {
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
@@ -344,7 +344,7 @@ fetch('http://localhost:3000/box1')
 });
 
 //most brokend equipment card
-fetch('http://localhost:3000/box2')
+fetch(`${window.CONFIG.API_URL}/executive/box2`)
 .then(response => {
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
@@ -364,7 +364,7 @@ fetch('http://localhost:3000/box2')
   document.getElementById('equipment-name').textContent = "Error loading data";
 });
 //most time
-fetch('http://localhost:3000/box3')
+fetch(`${window.CONFIG.API_URL}/executive/box3`)
 .then(response => {
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
@@ -384,7 +384,7 @@ fetch('http://localhost:3000/box3')
   document.getElementById('time').textContent = "Error loading data";
 });
 //most department
-fetch('http://localhost:3000/box4')
+fetch(`${window.CONFIG.API_URL}/executive/box4`)
 .then(response => {
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
@@ -405,7 +405,7 @@ fetch('http://localhost:3000/box4')
 });
 
 //card chart1
-fetch('http://localhost:3000/TableRoomBooked')
+fetch(`${window.CONFIG.API_URL}/executive/TableRoomBooked`)
 .then(response => response.json())
 .then(data => {
 // ดึงชื่อห้องมาเป็น Labels
@@ -445,7 +445,7 @@ new Chart(ctx, {
 
 
 //card chart 2
-fetch('http://localhost:3000/TableBrokenEqipment')
+fetch(`${window.CONFIG.API_URL}/executive/TableBrokenEqipment`)
 .then(response => response.json())
 .then(data => {
 // ดึงชื่ออุปกรณ์ที่เสียมาเป็น Labels
@@ -483,7 +483,7 @@ new Chart(ctx, {
 .catch(error => console.error("❌ Error fetching data:", error));
 
 //card chart 3
-fetch('http://localhost:3000/daysroomday')
+fetch(`${window.CONFIG.API_URL}/executive/daysroomday`)
 .then(response => response.json())
 .then(data => {
 // ดึงชื่ออุปกรณ์ที่เสียมาเป็น Labels
@@ -522,7 +522,7 @@ new Chart(ctx, {
 
 
 //card chart4
-fetch('http://localhost:3000/box42')
+fetch(`${window.CONFIG.API_URL}/executive/box42`)
 .then(response => response.json())
 .then(data => {
 // ดึงชื่ออุปกรณ์ที่เสียมาเป็น Labels
