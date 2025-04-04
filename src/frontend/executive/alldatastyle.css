@@ -1,0 +1,303 @@
+.body{
+    background-color: white;
+}
+.container {
+    width: 80%;
+    /* Container width */
+    margin: auto;
+    /* Center the container horizontally */
+    padding: 20px;
+    /* Inner spacing */
+    border: 1px solid #AFAFAF;
+    /* Optional border */
+    background-color: rgb(255, 255, 255);
+    /* Optional background color */
+    display: flex;
+    /* Flexbox for layout */
+    flex-direction: column;
+    /* จัดเรียงองค์ประกอบในแนวตั้ง */
+    align-items: center;
+    /* จัดกลางแนวนอน */
+    border-radius: 20px;
+    position: relative;
+    /* ตั้งค่า relative เพื่อใช้กับตำแหน่ง absolute */
+    cursor: pointer;
+}
+.chart{
+    margin-top: 30px;
+}
+
+.most-room {
+    text-align: left;
+    position: absolute;
+    /* ใช้ position absolute */
+    top: 0;
+    /* อยู่ที่ด้านบน */
+    left: 0;
+    /* อยู่ที่ด้านซ้าย */
+    margin: 10px;
+    /* เพิ่มระยะห่างจากขอบ */
+}
+
+.chart-header {
+    padding: 10px 0;
+    margin-top: -5%;
+}
+
+.container img {
+    display: block;
+    /* Makes the image a block-level element */
+    margin-left: auto;
+    /* Centers the image horizontally */
+    margin-right: auto;
+    /* Centers the image horizontally */
+    padding: 10px;
+    /* Space between the image and the border */
+    max-width: 100%;
+    /* Ensure the image is responsive */
+    height: auto;
+    /* Maintain aspect ratio */
+}
+
+.container p {
+    display: inline-block;
+    /* ให้ <p> อยู่ในบรรทัดเดียวกับกล่อง */
+    margin-left: 10px;
+    /* Space between the <p> and other elements */
+    margin-top: 10px;
+    /* เพิ่มระยะห่างระหว่าง <p> กับ <img> */
+}
+
+
+.container-two {
+    width: 90%;
+    /* Container width */
+    margin: auto;
+    /* Center the container horizontally */
+    padding: 20px;
+    /* Inner spacing */
+    background-color: #f8f9fa;
+    /* Optional background color */
+    display: flex;
+    border-radius: 20px;
+    justify-content: space-between;
+    margin: auto;
+
+}
+
+.container-two section {
+    width: 50%;
+}
+
+.graph-header {
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 10px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.container-two .graph-container {
+    width: 80%;
+    /* กำหนดความกว้าง */
+    margin: auto;
+    /* จัดให้อยู่ตรงกลาง */
+    padding: 20px;
+    /* ระยะห่างภายใน */
+    border: 1px solid #AFAFAF;
+    /* กรอบเส้น */
+    background-color: rgb(255, 255, 255);
+    /* สีพื้นหลัง */
+    display: flex;
+    flex-direction: column;
+    /* จัดเรียงองค์ประกอบในแนวตั้ง */
+    border-radius: 20px;
+    position: relative;
+    padding-top: 20px;
+    cursor: pointer;
+}
+
+.graph-container p {
+    font-size: 16px;
+    /* ขนาดตัวอักษร */
+    color: black;
+    /* สีข้อความ */
+    margin-top: 20px;
+    /* ระยะห่างระหว่างภาพและข้อความ */
+    display: inline-block;
+    /* ทำให้ <p> ขึ้นบรรทัดใหม่ */
+    vertical-align: middle;
+    /* จัดแนวตั้งให้อยู่ในแนวเดียวกัน */
+    margin-top: 0;
+    /* ลบ margin-top ที่อาจทำให้เกิดระยะห่าง */
+}
+
+
+.monthly-container {
+    width: 80%;
+    /* กำหนดความกว้าง */
+    margin: auto;
+    /* จัดให้อยู่ตรงกลาง */
+    padding: 20px;
+    /* ระยะห่างภายใน */
+    border: 1px solid #000000;
+    /* กรอบเส้น */
+    background-color: rgb(255, 255, 255);
+    /* สีพื้นหลัง */
+    display: flex;
+    flex-direction: column;
+    /* จัดเรียงองค์ประกอบในแนวตั้ง */
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+}
+
+.monthly img {
+    display: block;
+    /* ทำให้ภาพเป็น block-level element */
+    margin-left: auto;
+    /* จัดให้อยู่ตรงกลาง */
+    margin-right: auto;
+    /* จัดให้อยู่ตรงกลาง */
+    padding: 10px;
+    /* ระยะห่างระหว่างภาพกับกรอบ */
+    max-width: 100%;
+    /* ให้ภาพขยายเต็มความกว้าง */
+    max-height: 100%;
+    height: auto;
+    /* รักษาสัดส่วนของภาพ */
+    padding-top: 20px;
+}
+
+.container-three {
+    width: 90%;
+    /* Container width */
+    margin: auto;
+    /* Center the container horizontally */
+    padding: 20px;
+    /* Inner spacing */
+    background-color: #f8f9fa;
+    /* Optional background color */
+    display: flex;
+    border-radius: 20px;
+    justify-content: space-between;
+    padding-bottom: 60px;
+}
+
+.container-three section {
+    width: 50%;
+}
+
+.equipment {
+    width: auto;
+    /* กำหนดความกว้าง */
+    margin: auto;
+    /* จัดให้อยู่ตรงกลาง */
+    padding: 20px;
+    /* ระยะห่างภายใน */
+    border: 1px solid #AFAFAF;
+    /* กรอบเส้น */
+    background-color: rgb(255, 255, 255);
+    /* สีพื้นหลัง */
+    display: flex;
+    /* ใช้ Flexbox */
+    flex-direction: column;
+    /* จัดเรียงองค์ประกอบในแนวตั้ง */
+    border-radius: 20px;
+    position: relative;
+    /* ตั้งค่า relative เพื่อใช้ absolute ด้านใน */
+    align-items: center;
+    /* จัดแนวนอนให้อยู่กลาง */
+    justify-content: flex-start;
+    /* เนื้อหาอยู่ด้านบน */
+    height: auto;
+    /* กำหนดความสูงเพื่อให้ปุ่มติดล่าง */
+    padding-bottom: 60px;
+}
+.moststuden-container button {
+    background-color: #622b86;
+    color: white;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    bottom: 10px; /* ปุ่มจะอยู่ด้านล่างของ container */
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.equipment button {
+    background-color: #622b86;
+    color: white;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    bottom: 10px; /* ปุ่มจะอยู่ด้านล่างของ container */
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.graph button {
+    background-color: #622b86;
+    color: white;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    bottom: 10px; /* ปุ่มจะอยู่ด้านล่างของ container */
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.moststuden-container {
+    width: auto; /* กำหนดความกว้าง */
+    margin: auto; /* จัดให้อยู่ตรงกลาง */
+    padding: 20px; /* ระยะห่างภายใน */
+    border: 1px solid #AFAFAF; /* กรอบเส้น */
+    background-color: rgb(255, 255, 255); /* สีพื้นหลัง */
+    display: flex;
+    flex-direction: column; /* จัดเรียงองค์ประกอบในแนวตั้ง */
+    border-radius: 20px; /* มุมโค้ง */
+    position: relative; /* ตั้งตำแหน่งแบบ relative เพื่อให้ใช้งานกับ absolute */
+    text-align: center; /* จัดข้อความให้อยู่ตรงกลาง */
+    padding-bottom: 100px;
+    margin-left: 50px;
+}
+
+.moststuden-header {
+    margin: 0; /* ลบ margin เริ่มต้น */
+    padding: 10px; /* เพิ่ม padding เล็กน้อย */
+    font-size: 18px; /* กำหนดขนาดตัวอักษร */
+    font-weight: bold; /* ทำให้ตัวอักษรหนา */
+    margin-bottom: 15px; /* เพิ่มช่องว่างด้านล่างของหัวข้อ */
+}
+
+.split-container {
+    display: flex;
+    justify-content: space-between; /* ทำให้ p3 อยู่ซ้ายและ p4 อยู่ขวา */
+    align-self:center;
+    margin-bottom: 5px; /* เพิ่มระยะห่างระหว่างแถว */
+  }
+  
+.p3,.p4{
+    margin: 0; /* ลบ margin ของ p3 และ p4 */
+    padding: 0; /* ลบ padding ของ p3 และ p4 */
+}
+
+.dropdown {
+    display: inline-block;
+    margin-left: 10px;
+  }
+  
+.dropdown-menu {
+    width: 200px;
+}
+  
