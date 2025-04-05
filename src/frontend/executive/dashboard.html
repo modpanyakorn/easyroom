@@ -175,6 +175,21 @@
 <script src="../script/config.js"></script>
 <script src="script/dashboard.js"></script>
 <script>
+    fetch("sidebar.html")
+        .then((resp) => resp.text())
+        .then((html) => {
+            // แทรก Sidebar เข้ามา
+            document.getElementById("sidebar-container").innerHTML = html;
+        })
+        .then(() => {
+            // ให้ Highlight ปุ่มสถิติ
+            const btnStats = document.getElementById("btnStatistic");
+            btnStats.classList.add("btn-sidebar-active");
+        })
+        .catch((err) => console.error("Failed to load sidebar:", err));
+
+    
+
 </script>
 
 </html>

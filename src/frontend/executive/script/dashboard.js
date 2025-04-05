@@ -1,16 +1,3 @@
-fetch("sidebar.html")
-        .then((resp) => resp.text())
-        .then((html) => {
-            // แทรก Sidebar เข้ามา
-            document.getElementById("sidebar-container").innerHTML = html;
-        })
-        .then(() => {
-            // ให้ Highlight ปุ่มสถิติ
-            const btnStats = document.getElementById("btnStatistic");
-            btnStats.classList.add("btn-sidebar-active");
-        })
-        .catch((err) => console.error("Failed to load sidebar:", err));
-
 let barChart = null; // ตัวแปรเก็บกราฟ
 let rooms = []; // เก็บข้อมูลห้องที่ได้จาก API
 
@@ -150,7 +137,6 @@ function renderBarChart(data) {
 window.addEventListener('DOMContentLoaded', () => {
   loadRooms(); // โหลดห้อง
 });
-
 
 //doughnutChart
 fetch(`${window.CONFIG.API_URL}/executive/borrowEquipment`)
@@ -509,39 +495,158 @@ fetch(`${window.CONFIG.API_URL}/executive/box4`)
   document.getElementById('department-name').textContent = "Error loading data";
 });
 
-function loadTopReporters() {
-  const role = document.getElementById("roleFilter").value;
-  let url = `${window.CONFIG.API_URL}/executive/mostreport`;
+//card chart1
+fetch(`${window.CONFIG.API_URL}/executive/TableRoomBooked`)
+.then(response => response.json())
+.then(data => {
+// ดึงชื่อห้องมาเป็น Labels
+const labels = data.map(item => item.room_name);
+// ดึงจำนวนอุปกรณ์ที่เสียมาเป็นค่าใน Chart
+const values = data.map(item => item.total);
 
-  if (role) {
-      url += `?role=${role}`;
+var ctx = document.getElementById('pointLineCardChart1').getContext('2d');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: labels,
+    datasets: [{
+      data: values,
+      backgroundColor: 'rgba(255, 255, 255, 0.8)', // สีของแท่ง
+      borderWidth: 0,
+      barPercentage: 1,
+      categoryPercentage: 1
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false }, // ซ่อน Legend
+      tooltip: { enabled: false } // ซ่อน Tooltip
+    },
+    scales: {
+      x: { display: false }, // ซ่อนแกน X
+      y: { display: false } // ซ่อนแกน Y
+    }
   }
-
-  fetch(url)
-      .then(response => response.json()) // แปลงเป็น JSON
-      .then(data => {
-          const userList = document.getElementById("ReportList");
-          userList.innerHTML = "";  // ล้างข้อมูลเก่า
-
-          if (data.length === 0) {
-              userList.innerHTML = "<p>ไม่พบข้อมูล</p>";
-              return;
-          }
-
-          data.forEach(user => {
-              const div = document.createElement("div");
-              div.className = "split-container";
-              div.innerHTML = `<p>${user.name}</p> <p>${user.stat} ครั้ง</p>`;
-              userList.appendChild(div);
-          });
-      })
-      .catch(error => {
-          console.error("เกิดข้อผิดพลาด:", error);
-          document.getElementById("ReportList").innerHTML = "ไม่สามารถโหลดข้อมูลได้";
-      });
-}
-
-// เรียกฟังก์ชันทันทีเมื่อโหลดหน้า (แสดงทั้งหมด)
-document.addEventListener("DOMContentLoaded", () => {
-  loadTopReporters();
 });
+})
+.catch(error => console.error("❌ Error fetching data:", error));
+
+
+
+//card chart 2
+fetch(`${window.CONFIG.API_URL}/executive/TableBrokenEqipment`)
+.then(response => response.json())
+.then(data => {
+// ดึงชื่ออุปกรณ์ที่เสียมาเป็น Labels
+const labels = data.map(item => item.name);
+// ดึงจำนวนอุปกรณ์ที่เสียมาเป็นค่าใน Chart
+const values = data.map(item => item.totalbrokend);
+
+var ctx = document.getElementById('pointLineCardChart2').getContext('2d');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: labels,
+    datasets: [{
+      data: values,
+      backgroundColor: 'rgba(255, 255, 255, 0.8)', // สีของแท่ง
+      borderWidth: 0,
+      barPercentage: 1,
+      categoryPercentage: 1
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false }, // ซ่อน Legend
+      tooltip: { enabled: false } // ซ่อน Tooltip
+    },
+    scales: {
+      x: { display: false }, // ซ่อนแกน X
+      y: { display: false } // ซ่อนแกน Y
+    }
+  }
+});
+})
+.catch(error => console.error("❌ Error fetching data:", error));
+
+//card chart 3
+fetch(`${window.CONFIG.API_URL}/executive/daysroomday`)
+.then(response => response.json())
+.then(data => {
+// ดึงชื่ออุปกรณ์ที่เสียมาเป็น Labels
+const labels = data.map(item => item.time);
+// ดึงจำนวนอุปกรณ์ที่เสียมาเป็นค่าใน Chart
+const values = data.map(item => item.total_requests);
+
+var ctx = document.getElementById('pointLineCardChart3').getContext('2d');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: labels,
+    datasets: [{
+      data: values,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)', // สีของแท่ง
+      borderWidth: 0,
+      barPercentage: 1,
+      categoryPercentage: 1
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false }, // ซ่อน Legend
+      tooltip: { enabled: false } // ซ่อน Tooltip
+    },
+    scales: {
+      x: { display: false }, // ซ่อนแกน X
+      y: { display: false } // ซ่อนแกน Y
+    }
+  }
+});
+})
+.catch(error => console.error("❌ Error fetching data:", error));
+
+
+//card chart4
+fetch(`${window.CONFIG.API_URL}/executive/box42`)
+.then(response => response.json())
+.then(data => {
+// ดึงชื่ออุปกรณ์ที่เสียมาเป็น Labels
+const labels = data.map(item => item.name);
+// ดึงจำนวนอุปกรณ์ที่เสียมาเป็นค่าใน Chart
+const values = data.map(item => item.d_count);
+
+var ctx = document.getElementById('pointLineCardChart4').getContext('2d');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: labels,
+    datasets: [{
+      data: values,
+      backgroundColor: 'rgba(255, 255, 255, 0.8)', // สีของแท่ง
+      borderWidth: 0,
+      barPercentage: 1,
+      categoryPercentage: 1
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false }, // ซ่อน Legend
+      tooltip: { enabled: false } // ซ่อน Tooltip
+    },
+    scales: {
+      x: { display: false }, // ซ่อนแกน X
+      y: { display: false } // ซ่อนแกน Y
+    }
+  }
+});
+})
+.catch(error => console.error("❌ Error fetching data:", error));
+
