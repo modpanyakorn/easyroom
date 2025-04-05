@@ -698,45 +698,57 @@
         }
       }
       async function submitRejection(
-        requestID,
-        reject_reason,
-        detail_reject_reason,
-        updateNewStatus
-      ) {
-        Swal.fire({
-          title: "ยืนยันที่จะไม่อนุมัติการจองห้อง?",
-          text: "โปรดยืนยันว่าคุณต้องการไม่อนุมัติคำขอนี้",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonText: "ยืนยัน",
-          cancelButtonText: "ยกเลิก",
-        }).then(async (result) => {
-          if (result.isConfirmed) {
-            try {
-              const res = await fetch(`${window.CONFIG.API_URL}/executive/submitRejection`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  room_request_id: requestID,
-                  reject_reason,
-                  detail_reject_reason,
-                  executive_id: "CSB25645",
-                }),
-              });
-              if (!res.ok) throw new Error("การบันทึกล้มเหลว");
-              await updateStatus(requestID, updateNewStatus);
-              Swal.fire(
-                "สถานะถูกอัปเดต!",
-                "คำขอไม่ได้รับการอนุมัติ",
-                "success"
-              );
-            } catch (err) {
-              console.error("❌ Error in submitRejection:", err);
-              Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถอัปเดตสถานะได้", "error");
-            }
-          }
+  requestID,
+  reject_reason,
+  detail_reject_reason,
+  updateNewStatus
+) {
+  // เรียกใช้ฟังก์ชัน fetchUserInfo() เพื่อดึงข้อมูลจาก session
+  const userSession = await fetchUserInfo();
+  if (!userSession) {
+    return; // ถ้าไม่สามารถดึงข้อมูลผู้ใช้ได้ ให้หยุดทำงาน
+  }
+
+  // ดึง executive_id จาก userSession
+  const executive_id = userSession.data.user_id; // แทนที่ด้วย executive_id ที่ได้รับจาก session
+
+  Swal.fire({
+    title: "ยืนยันที่จะไม่อนุมัติการจองห้อง?",
+    text: "โปรดยืนยันว่าคุณต้องการไม่อนุมัติคำขอนี้",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "ยืนยัน",
+    cancelButtonText: "ยกเลิก",
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const res = await fetch(`${window.CONFIG.API_URL}/executive/submitRejection`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            room_request_id: requestID,
+            reject_reason,
+            detail_reject_reason,
+            executive_id, // ใช้ executive_id จาก session
+          }),
         });
+
+        if (!res.ok) throw new Error("การบันทึกล้มเหลว");
+
+        await updateStatus(requestID, updateNewStatus);
+
+        Swal.fire(
+          "สถานะถูกอัปเดต!",
+          "คำขอไม่ได้รับการอนุมัติ",
+          "success"
+        );
+      } catch (err) {
+        console.error("❌ Error in submitRejection:", err);
+        Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถอัปเดตสถานะได้", "error");
       }
+    }
+  });
+}
       async function updateStatus(requestId, newStatus) {
         try {
           const res = await fetch(`${window.CONFIG.API_URL}/executive/updateStatus`, {
@@ -779,5 +791,8 @@
         })
         .catch((err) => console.error("Failed to load sidebar:", err));
     </script>
+    <script src="../script/config.js"></script>
+    <script src="../script/auth.js"></script>
+    
   </body>
 </html>
