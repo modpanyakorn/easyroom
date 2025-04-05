@@ -150,24 +150,20 @@
             
             <div class="statistics-card">
                 <h6 style="text-align: center;">นิสิตที่แจ้งซ่อมอุปกรณ์บ่อยที่สุด</h6>
-
+            
                 <div style="margin-top: 20px; text-align: center;">
                     <label for="roleFilter">บทบาท:</label>
-                    <select id="roleFilter">
+                    <select id="roleFilter" onchange="loadTopReporters()"> <!-- เพิ่ม event onchange -->
                         <option value="">ทั้งหมด</option>
                         <option value="student">นิสิต</option>
                         <option value="teacher">อาจารย์</option>
                     </select>
-
-                    <button onclick="loadTopReporters()" style="margin-left: 10px;">ค้นหา</button>
                 </div>
-
+            
                 <section id="ReportList" style="margin-top: 20px;"></section>
-
+            
                 <button class="details-btn" onclick="window.location.href='reporttable.html'">Details</button>
             </div>
-
-        </div>
 
     </div>
 </body>
