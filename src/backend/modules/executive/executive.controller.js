@@ -18,36 +18,53 @@ exports.getEquipment_brokened = (req, res) => {
       res.json(results);
     });
   };
-exports.brokendEquipment = async  (req, res) => {
-    connection.query(`SELECT e.equipment_name as name , COUNT(eb.equipment_id) as total  FROM equipment_brokened as eb 
-JOIN equipment as e ON e.equipment_id = eb.equipment_id
-GROUP BY eb.equipment_id 
-ORDER BY total DESC LIMIT 3`, (err, results) => {
-        if (err) {
-            console.error('❌ เกิดข้อผิดพลาด:', err);
-            res.status(500).send(err);
-            return;
-        }
-        console.log('✅ ดึงข้อมูลสำเร็จ:', results);
-        res.json(results);
+  exports.brokendEquipment = async (req, res) => {
+    const roomId = req.query.room_id || null;
+  
+    const sql = `
+      SELECT e.equipment_name AS name, COUNT(eb.equipment_id) AS total
+      FROM equipment_brokened AS eb
+      JOIN equipment AS e ON e.equipment_id = eb.equipment_id
+      WHERE (? IS NULL OR eb.room_id = ?)
+      GROUP BY eb.equipment_id
+      ORDER BY total DESC
+      LIMIT 3
+    `;
+  
+    connection.query(sql, [roomId, roomId], (err, results) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json(results);
     });
-};
-exports.borrowEquipment = async (req, res) => {
-    connection.query(`SELECT  rrm.equipment_id,e.equipment_name as name ,SUM(rrm.request_quantity) as total FROM room_request_equipment as rrm
-LEFT JOIN equipment as e ON e.equipment_id = rrm.equipment_id
-LEFT JOIN room as r ON r.room_id = rrm.room_id
-GROUP BY rrm.equipment_id,e.equipment_name
-ORDER BY total DESC LIMIT 3 ;`, (err, results) => {
-        if (err) {
-            console.error('❌ เกิดข้อผิดพลาด:', err);
-            res.status(500).send(err);
-            return;
-        }
-        console.log('✅ ดึงข้อมูลสำเร็จ:', results);
-        res.json(results);
+  };
+  
+  exports.borrowEquipment = async (req, res) => {
+    const roomId = req.query.room_id || null;
+  
+    const sql = `
+      SELECT rrm.equipment_id, e.equipment_name AS name, SUM(rrm.request_quantity) AS total
+      FROM room_request_equipment AS rrm
+      LEFT JOIN equipment AS e ON e.equipment_id = rrm.equipment_id
+      LEFT JOIN room AS r ON r.room_id = rrm.room_id
+      WHERE (? IS NULL OR rrm.room_id = ?)
+      GROUP BY rrm.equipment_id, e.equipment_name
+      ORDER BY total DESC
+      LIMIT 3
+    `;
+  
+    connection.query(sql, [roomId, roomId], (err, results) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json(results);
     });
-};
-
+  };
+  
+exports.doughnutrooms = async (req, res) => {
+    const query = `SELECT room_id, room_name FROM room ORDER BY room_name`;
+    connection.query(query, (err, results) => {
+      if (err) return res.status(500).send(err);
+      res.json(results);
+    });
+  };
+  
 exports.mostroomalldata = async (req, res) => {
     const query = `SELECT 
     room_id,
