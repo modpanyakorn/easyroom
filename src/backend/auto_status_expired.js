@@ -3,16 +3,22 @@ const connection = require("./core/db"); // <-- path เปลี่ยนตา
 exports.autoExpireRequests = async () => {
   try {
     const now = new Date();
-    const formattedNow = now.toISOString().slice(0, 19).replace("T", " "); // MySQL format
+
+    // ถ้าอยากให้ใช้เวลาของ Time Zone Bangkok (Asia/Bangkok)
+    const options = { timeZone: "Asia/Bangkok", hour12: false };
+    const formattedNow = new Intl.DateTimeFormat("en-GB", options).format(now);
+    
+    // แปลงเป็น MySQL format (YYYY-MM-DD HH:mm:ss)
+    const mysqlFormattedNow = formattedNow.replace(", ", " "); 
 
     const sql = `
       UPDATE room_request
       SET request_status = 'คำขอหมดอายุ'
       WHERE request_status IN ('รอดำเนินการ', 'รออนุมัติ')
-        AND TIMESTAMP(used_date, end_time) < ?
+        AND TIMESTAMP(used_date, end_time) <= CONVERT_TZ(NOW(), 'UTC', 'Asia/Bangkok');
     `;
 
-    connection.query(sql, [formattedNow], (err, result) => {
+    connection.query(sql, [mysqlFormattedNow], (err, result) => {
       if (err) {
         console.error("❌ Query error:", err);
         return;
