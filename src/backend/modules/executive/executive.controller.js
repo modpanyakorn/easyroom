@@ -49,27 +49,34 @@ ORDER BY total DESC LIMIT 3 ;`, (err, results) => {
 };
 
 exports.mostroomalldata = async (req, res) => {
-    const query = `SELECT 
-    room_id,
-    SUM(cs_count) AS cs_count,
-    SUM(it_count) AS it_count,
-    SUM(total_count) AS total_count
-FROM (
+    const roomId = req.query.room_id || null; // รับค่าห้องจาก query
+
+    const query = `
     SELECT 
-        rr.room_id,
-        SUM(CASE WHEN COALESCE(s.department, t.department) = 'วิทยาการคอมพิวเตอร์' THEN 1 ELSE 0 END) AS cs_count,
-        SUM(CASE WHEN COALESCE(s.department, t.department) = 'เทคโนโลยีสารสนเทศ' THEN 1 ELSE 0 END) AS it_count,
-        COUNT(rr.student_id) + COUNT(rr.teacher_id) AS total_count
-    FROM room_request AS rr
-    LEFT JOIN student AS s ON rr.student_id = s.student_id
-    LEFT JOIN teacher AS t ON rr.teacher_id = t.teacher_id
-    WHERE rr.request_status = 'อนุมัติ'
-    GROUP BY rr.room_id, COALESCE(s.department, t.department)
-) AS subquery
-GROUP BY room_id
-ORDER BY room_id;
-`
-    connection.query(query, (err, results) => {
+      room_id,
+      SUM(cs_count) AS cs_count,
+      SUM(it_count) AS it_count,
+      SUM(total_count) AS total_count
+    FROM (
+        SELECT 
+            rr.room_id,
+            SUM(CASE WHEN COALESCE(s.department, t.department) = 'วิทยาการคอมพิวเตอร์' THEN 1 ELSE 0 END) AS cs_count,
+            SUM(CASE WHEN COALESCE(s.department, t.department) = 'เทคโนโลยีสารสนเทศ' THEN 1 ELSE 0 END) AS it_count,
+            COUNT(rr.student_id) + COUNT(rr.teacher_id) AS total_count
+        FROM room_request AS rr
+        LEFT JOIN student AS s ON rr.student_id = s.student_id
+        LEFT JOIN teacher AS t ON rr.teacher_id = t.teacher_id
+        WHERE rr.request_status = 'อนุมัติ'
+        ${roomId ? `AND rr.room_id = ?` : ''}  -- กรองตามห้องถ้ามี
+        GROUP BY rr.room_id, COALESCE(s.department, t.department)
+    ) AS subquery
+    GROUP BY room_id
+    ORDER BY room_id;
+    `;
+
+    const params = roomId ? [roomId] : [];
+
+    connection.query(query, params, (err, results) => {
         if (err) {
             console.error('❌ เกิดข้อผิดพลาด:', err);
             res.status(500).send(err);
@@ -79,6 +86,8 @@ ORDER BY room_id;
         res.json(results);
     });
 };
+
+
 exports.daysroomday = async (req, res) => {
     const query = `SELECT 
     DAYNAME(rr.used_date) AS time,  -- ชื่อวัน

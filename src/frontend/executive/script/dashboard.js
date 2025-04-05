@@ -1,97 +1,132 @@
-fetch(`${window.CONFIG.API_URL}/executive/mostroomalldata`)
-.then(response => {
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  return response.json();
-})
-.then(data => {
-  console.log("Fetched Data:", data); // 🛠 Debug: ดูข้อมูล API
+// ตัวแปรเก็บข้อมูล
+// let roomData = [];
+// let allData = [];
 
-  const barCtx = document.getElementById('barChart').getContext('2d');
-  if (!barCtx) {
-    console.error("Canvas element not found!");
-    return;
-  }
+// // ฟังก์ชันโหลดห้องจาก API
+// function loadRoomOptions() {
+//   fetch(`${window.CONFIG.API_URL}/executive/rooms`)
+//     .then(response => response.json())
+//     .then(rooms => {
+//       const roomFilter = document.getElementById('roomFilter');
+//       rooms.forEach(room => {
+//         const option = document.createElement('option');
+//         option.value = room.room_id;
+//         option.textContent = `SC2-${room.room_id}`;
+//         roomFilter.appendChild(option);
+//       });
+//     })
+//     .catch(error => {
+//       console.error("❌ Error loading rooms:", error);
+//     });
+// }
 
-  // Prepare data for the Chart.js chart after fetching
-  const labels = data.map(item => `SC2-${item.room_id}`);
-  const totalCount = data.map(item => item.total_count);
-  const csCount = data.map(item => item.cs_count);
-  const itCount = data.map(item => item.it_count);
+// // ฟังก์ชันกรองข้อมูลตามห้อง
+// function filterDataByRoom() {
+//   const roomId = document.getElementById("roomFilter").value;
+  
+//   // หากไม่เลือกห้อง ให้โหลดข้อมูลทั้งหมด
+//   const filteredData = roomId ? allData.filter(item => item.room_id === roomId) : allData;
 
-  new Chart(barCtx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [
-        {
-          label: 'จำนวนนิสิตรวม',
-          data: totalCount,
-          backgroundColor: '#E5D2BA'
-        },
-        {
-          label: 'จำนวนนิสิต สาขา วิทยาการคอมฯ',
-          data: csCount,
-          backgroundColor: '#E54715'
-        },
-        {
-          label: 'จำนวนนิสิต สาขาเทคโนโลยีฯ',
-          data: itCount,
-          backgroundColor: '#622BBE',
-          padding: {
-            top: 10,
-            bottom: 30
-          }
-        }
-      ]
-    },
-    options: {
-      // maxBarThickness:30,
-      responsive: false,
-      plugins: {
-        legend: {
-          position: 'bottom', // Position legend at the bottom
-          labels: {
-            font: {
-              size: 16 // 🔥 ปรับขนาดฟอนต์ของ legend
-            }
-          }
-        },
-        title: {
-          display: true,
-          text: 'ข้อมูลจำนวนนิสิต',
-          font: {
-            size: 14 // 🔥 ปรับขนาดฟอนต์ของ title
-          }
-        }
-      },
-      scales: {
-        x: {
-          ticks: {
-            font: {
-              size: 16 // 🔥 ปรับขนาดฟอนต์ของ labels บนแกน X
-            }
-          }
-        },
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: function (value) {
-              return Math.floor(value); // 🔥 ปัดค่าทศนิยมออก
-            },
-            font: {
-              size: 14 // 🔥 ปรับขนาดฟอนต์ของ labels บนแกน Y
-            }
-          }
-        }
-      }
-    }
-  });
-})
-.catch(error => {
-  console.error('Error fetching data:', error);
-});
+//   // แสดงกราฟใหม่
+//   renderBarChart(filteredData);
+// }
+
+// // ฟังก์ชันการเรนเดอร์กราฟ
+// function renderBarChart(data) {
+//   const barCtx = document.getElementById('barChart').getContext('2d');
+//   if (!barCtx) {
+//     console.error("❌ Canvas element not found!");
+//     return;
+//   }
+
+//   const labels = data.map(item => `SC2-${item.room_id}`);
+//   const totalCount = data.map(item => item.total_count);
+//   const csCount = data.map(item => item.cs_count);
+//   const itCount = data.map(item => item.it_count);
+
+//   new Chart(barCtx, {
+//     type: 'bar',
+//     data: {
+//       labels: labels,
+//       datasets: [
+//         {
+//           label: 'จำนวนนิสิตรวม',
+//           data: totalCount,
+//           backgroundColor: '#E5D2BA'
+//         },
+//         {
+//           label: 'จำนวนนิสิต สาขา วิทยาการคอมฯ',
+//           data: csCount,
+//           backgroundColor: '#E54715'
+//         },
+//         {
+//           label: 'จำนวนนิสิต สาขาเทคโนโลยีฯ',
+//           data: itCount,
+//           backgroundColor: '#622BBE',
+//           padding: {
+//             top: 10,
+//             bottom: 30
+//           }
+//         }
+//       ]
+//     },
+//     options: {
+//       responsive: false,
+//       plugins: {
+//         legend: {
+//           position: 'bottom',
+//           labels: {
+//             font: {
+//               size: 16
+//             }
+//           }
+//         },
+//         title: {
+//           display: true,
+//           text: 'ข้อมูลจำนวนนิสิต',
+//           font: {
+//             size: 14
+//           }
+//         }
+//       },
+//       scales: {
+//         x: {
+//           ticks: {
+//             font: {
+//               size: 16
+//             }
+//           }
+//         },
+//         y: {
+//           beginAtZero: true,
+//           ticks: {
+//             callback: function (value) {
+//               return Math.floor(value);
+//             },
+//             font: {
+//               size: 14
+//             }
+//           }
+//         }
+//       }
+//     }
+//   });
+// }
+
+// // โหลดข้อมูลจาก API และแสดงกราฟ
+// fetch(`${window.CONFIG.API_URL}/executive/mostroomalldata`)
+//   .then(response => response.json())
+//   .then(data => {
+//     allData = data;  // เก็บข้อมูลทั้งหมด
+//     renderBarChart(data);  // แสดงกราฟทั้งหมด
+
+//     // เรียกใช้งานฟังก์ชันโหลดห้อง
+//     loadRoomOptions();
+//   })
+//   .catch(error => {
+//     console.error('❌ Error fetching data:', error);
+//   });
+
 //doughnutChart
 fetch(`${window.CONFIG.API_URL}/executive/borrowEquipment`)
 .then(response => {
@@ -564,43 +599,3 @@ new Chart(ctx, {
 });
 })
 .catch(error => console.error("❌ Error fetching data:", error));
-
-
-//card chart4
-fetch(`${window.CONFIG.API_URL}/executive/box42`)
-.then(response => response.json())
-.then(data => {
-// ดึงชื่ออุปกรณ์ที่เสียมาเป็น Labels
-const labels = data.map(item => item.name);
-// ดึงจำนวนอุปกรณ์ที่เสียมาเป็นค่าใน Chart
-const values = data.map(item => item.d_count);
-
-var ctx = document.getElementById('pointLineCardChart4').getContext('2d');
-new Chart(ctx, {
-  type: 'bar',
-  data: {
-    labels: labels,
-    datasets: [{
-      data: values,
-      backgroundColor: 'rgba(255, 255, 255, 0.8)', // สีของแท่ง
-      borderWidth: 0,
-      barPercentage: 1,
-      categoryPercentage: 1
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false }, // ซ่อน Legend
-      tooltip: { enabled: false } // ซ่อน Tooltip
-    },
-    scales: {
-      x: { display: false }, // ซ่อนแกน X
-      y: { display: false } // ซ่อนแกน Y
-    }
-  }
-});
-})
-.catch(error => console.error("❌ Error fetching data:", error));
-

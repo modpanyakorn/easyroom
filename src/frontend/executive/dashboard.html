@@ -50,13 +50,23 @@
             </div>
         </div>
 
-        <div class="large-card" style="justify-content: center; align-items: center; ">
+        <div class="large-card" style="justify-content: center; align-items: center;">
             <h3>ห้องที่ใช้เยอะที่สุด</h3>
+            <div class="mb-3 text-center">
+                <label for="roomFilter" class="form-label">เลือกห้อง:</label>
+                <select id="roomFilter" class="form-select w-auto d-inline" onchange="filterRoom()">
+                    <option value="">ทั้งหมด</option> <!-- Default: show all rooms -->
+                    <!-- เพิ่ม options ห้องจะถูกโหลดจาก JS -->
+                </select>
+            </div>
             <div class="chart-container" style="display: flex; justify-content: center; align-items: center;">
                 <canvas id="barChart" style="height: 300px ; align-items: center;"></canvas>
             </div>
             <button class="details-btn" onclick="window.location.href='detailroom.html'">Details</button>
         </div>
+        
+        
+        
 
         <div class="statistics-container">
             <div class="statistics-card">
@@ -214,6 +224,148 @@
     document.addEventListener("DOMContentLoaded", () => {
         loadTopReporters();
     });
+
+    let barChart = null; // ตัวแปรเก็บกราฟ
+let rooms = []; // เก็บข้อมูลห้องที่ได้จาก API
+
+// ฟังก์ชันสำหรับโหลดข้อมูลห้องทั้งหมด
+function loadRooms() {
+  fetch(`${window.CONFIG.API_URL}/executive/mostroomalldata`)
+    .then(response => response.json())
+    .then(data => {
+      rooms = data.map(item => item.room_id); // เก็บ room_id ทั้งหมด
+      const roomFilter = document.getElementById('roomFilter');
+
+      // เพิ่ม option ใน dropdown
+      rooms.forEach(roomId => {
+        const option = document.createElement('option');
+        option.value = roomId;
+        option.textContent = `SC2-${roomId}`; // แสดงชื่อห้อง
+        roomFilter.appendChild(option);
+      });
+
+      filterRoom(); // โหลดข้อมูลกราฟเริ่มต้น
+    })
+    .catch(err => console.error('Error loading room list:', err));
+}
+
+// ฟังก์ชันสำหรับดึงข้อมูลกราฟตามห้องที่เลือก
+function filterRoom() {
+  const roomId = document.getElementById('roomFilter').value;
+  const filteredData = roomId ? rooms.filter(room => room === roomId) : rooms;
+
+  // ดึงข้อมูลกราฟจาก API โดยกรองตามห้อง
+  fetch(`${window.CONFIG.API_URL}/executive/mostroomalldata?room_id=${roomId}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log("Fetched Data:", data); // 🛠 Debug: ดูข้อมูล API
+      renderBarChart(data);
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
+}
+
+// ฟังก์ชัน renderBarChart ที่ใช้สร้างกราฟ
+function renderBarChart(data) {
+  const barCtx = document.getElementById('barChart').getContext('2d');
+  if (!barCtx) {
+    console.error("❌ Canvas element not found!");
+    return;
+  }
+
+  // หากมีกราฟเก่าอยู่แล้ว, ทำลายมันก่อน
+  if (barChart) {
+    barChart.destroy();
+  }
+
+  // เตรียมข้อมูลสำหรับกราฟ
+  const labels = data.map(item => `SC2-${item.room_id}`);
+  const totalCount = data.map(item => item.total_count);
+  const csCount = data.map(item => item.cs_count);
+  const itCount = data.map(item => item.it_count);
+
+  // สร้างกราฟใหม่
+  barChart = new Chart(barCtx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'จำนวนนิสิตรวม',
+          data: totalCount,
+          backgroundColor: '#E5D2BA'
+        },
+        {
+          label: 'จำนวนนิสิต สาขา วิทยาการคอมฯ',
+          data: csCount,
+          backgroundColor: '#E54715'
+        },
+        {
+          label: 'จำนวนนิสิต สาขาเทคโนโลยีฯ',
+          data: itCount,
+          backgroundColor: '#622BBE',
+          padding: {
+            top: 10,
+            bottom: 30
+          }
+        }
+      ]
+    },
+    options: {
+      responsive: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            font: {
+              size: 16
+            }
+          }
+        },
+        title: {
+          display: true,
+          text: 'ข้อมูลจำนวนนิสิต',
+          font: {
+            size: 14
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            font: {
+              size: 16
+            }
+          }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function (value) {
+              return Math.floor(value);
+            },
+            font: {
+              size: 14
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// โหลดห้องตั้งแต่เริ่ม
+window.addEventListener('DOMContentLoaded', () => {
+  loadRooms(); // โหลดห้อง
+});
+
+
 
 </script>
 
