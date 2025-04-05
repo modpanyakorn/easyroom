@@ -39,5 +39,5 @@ router.get("equipment_brokened",controller.equipment_brokened);
 router.get("/RejectReasons",controller.RejectReasons);
 router.get("/submitRejection",controller.submitRejection);
 router.get("/getRoomsAndRoles",controller.getRoomsAndRoles);
-router.get("/doughtnutrooms",controller.doughnutrooms);
+
 module.exports = router;

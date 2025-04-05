@@ -92,49 +92,32 @@ fetch(`${window.CONFIG.API_URL}/executive/mostroomalldata`)
 .catch(error => {
   console.error('Error fetching data:', error);
 });
-let borrowData = [];
-let brokenData = [];
-let chart1, chart2;
+//doughnutChart
+fetch(`${window.CONFIG.API_URL}/executive/borrowEquipment`)
+.then(response => {
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response.json();
+})
+.then(data => {
+  console.log("Fetched Data:", data); // 🛠 Debug: ดูข้อมูล API
 
-function loadRoomOptions() {
-  fetch(`${window.CONFIG.API_URL}/executive/doughnutrooms`)
-    .then(res => res.json())
-    .then(rooms => {
-      const roomFilter = document.getElementById('roomFilter');
-      rooms.forEach(room => {
-        const option = document.createElement('option');
-        option.value = room.room_id;
-        option.textContent = room.room_name;
-        roomFilter.appendChild(option);
-      });
-    })
-    .catch(err => console.error("❌ Error loading room list:", err));
-}
-function filterChartsByRoom() {
-  const roomId = document.getElementById("roomFilter").value;
-
-  fetch(`${window.CONFIG.API_URL}/executive/borrowEquipment?room_id=${roomId}`)
-    .then(res => res.json())
-    .then(data => renderDoughnutChart1(data));
-
-  fetch(`${window.CONFIG.API_URL}/executive/brokendEquipment?room_id=${roomId}`)
-    .then(res => res.json())
-    .then(data => renderDoughnutChart2(data));
-}
+  const doughnutCtx1 = document.getElementById('doughnutChart1');
 
 
-function renderDoughnutChart1(data) {
-  const ctx = document.getElementById('doughnutChart1');
-  if (!ctx) return;
-  if (chart1) chart1.destroy();
+  if (!doughnutCtx1) {
+    console.error("Canvas element donut not found!");
+    return;
+  }
 
-  chart1 = new Chart(ctx.getContext('2d'), {
+  new Chart(doughnutCtx1.getContext('2d'), {  // ✅ ใช้ .getContext('2d') ตรงนี้
     type: 'doughnut',
     data: {
-      labels: data.map(item => item.name),
+      labels: data.map(item => item.name), // ✅ ใช้คีย์ที่ถูกต้อง
       datasets: [{
         data: data.map(item => item.total),
-        backgroundColor: ['#E5D2BA', '#E54715', '#622BBE']
+        backgroundColor: ['#E5D2BA', '#E54715', '#622BBE'], // ✅ กำหนดสี
       }]
     },
     options: {
@@ -146,44 +129,56 @@ function renderDoughnutChart1(data) {
       }
     }
   });
-}
+})
+.catch(error => {
+  console.error("❌ Error fetching data:", error);
+});
+//doughtnut2
+fetch(`${window.CONFIG.API_URL}/executive/brokendEquipment`)
+.then(response => {
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response.json();
+})
+.then(data => {
+  console.log("Fetched Data:", data); // 🛠 Debug: ดูข้อมูล API
 
-function renderDoughnutChart2(data) {
-  const ctx = document.getElementById('doughnutChart2');
-  if (!ctx) return;
-  if (chart2) chart2.destroy();
+  const doughnutCtx1 = document.getElementById('doughnutChart2');
 
-  chart2 = new Chart(ctx.getContext('2d'), {
+
+  if (!doughnutCtx1) {
+    console.error("Canvas element donut not found!");
+    return;
+  }
+
+  new Chart(doughnutCtx1.getContext('2d'), {  // ✅ ใช้ .getContext('2d') ตรงนี้
     type: 'doughnut',
     data: {
-      labels: data.map(item => item.name),
+      labels: data.map(item => item.name), // ✅ ใช้คีย์ที่ถูกต้อง
       datasets: [{
         data: data.map(item => item.total),
-        backgroundColor: ['#E5D2BA', '#E54715', '#622BBE']
+        backgroundColor: ['#E5D2BA', '#E54715', '#622BBE'], // ✅ กำหนดสี
       }]
     },
     options: {
       responsive: true,
+
       plugins: {
         legend: { position: 'bottom' },
         title: { display: true, text: 'จำนวนอุปกรณ์ที่แจ้งซ่อม' }
       }
+
     }
   });
-}
-
-function showDoughnutChart(chartNumber) {
-  document.getElementById('doughnutChart1').style.display = (chartNumber === 1) ? 'block' : 'none';
-  document.getElementById('doughnutChart2').style.display = (chartNumber === 2) ? 'block' : 'none';
-}
-
-// โหลดรายชื่อห้อง และข้อมูลกราฟเริ่มต้น
-window.addEventListener('DOMContentLoaded', () => {
-  loadRoomOptions();
-  filterChartsByRoom(); // โหลดกราฟเริ่มต้น (ทั้งหมด)
+})
+.catch(error => {
+  console.error("❌ Error fetching data:", error);
 });
-
-
+function showDoughnutChart(chartNumber) {
+document.getElementById('doughnutChart1').style.display = (chartNumber === 1) ? 'block' : 'none';
+document.getElementById('doughnutChart2').style.display = (chartNumber === 2) ? 'block' : 'none';
+}
 //point line chart
 let chartInstance = null; // เก็บ instance ของ Chart เพื่อล้างค่าก่อนสร้างใหม่
 
