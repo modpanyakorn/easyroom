@@ -129,7 +129,7 @@
       </div>
     </div>
     </div>
-    <script src="../script/config.js"></script>
+
     <script>
       // Modal and Room Elements
       const modal = document.getElementById("roomModal");
@@ -224,7 +224,7 @@
             : "ปิดการใช้งาน";
 
         try {
-          const res = await fetch(`${CONFIG.API_URL}/updateRoomStatus`, {
+          const res = await fetch(`${API_URL}/admin/updateRoomStatus`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -263,7 +263,7 @@
       // Load room status from localStorage when the page reloads
       window.onload = async function () {
         try {
-          const response = await fetch(`${CONFIG.API_URL}/getRoomStatuses`);
+          const response = await fetch(`${API_URL}/admin/data/room`);
           const roomStatuses = await response.json();
 
           const rooms = document.querySelectorAll(".room");
@@ -345,9 +345,8 @@
         });
       });
     </script>
-    <script src="logout.js"></script>
-    <!-- <script src="CheckStatus.js"></script> -->
-     <script src="../script/auth.js"></script>
+    <script src="../script/config.js"></script>
+    <script src="../script/auth.js"></script>
 </body>
 
 </html>

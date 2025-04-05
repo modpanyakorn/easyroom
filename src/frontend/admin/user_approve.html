@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approval Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="executive.css" rel="stylesheet">
+    <style>
+        .actions2 i {
+            color: #AfAfAf;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="floor-buttons">
+            <a href="floor2.html"><button>ชั้น 2</button></a>
+            <a href="floor3.html"><button>ชั้น 3</button></a>
+            <a href="Index.html"><button>ชั้น 4</button></a>
+        </div>
+        <div class="report-buttons">
+            <button>คำร้องขอใช้งานห้อง</button>
+            <a href="request_crash_equipments.html"><button>รายงานอุปกรณ์ชำรุด</button></a>
+        </div>
+        <div class="logout-button">
+            <button onclick="logout()" class="btn btn-warning">ออกจากระบบ</button></div>
+        </div>
+    </header>
+
+    <div class="container mt-4">
+        <h3>รายการขอใช้ห้อง (อนุมัติแล้ว)</h3>
+        <div class="tab-bar">
+            <div class="tab"><a href="user_requests_InTime.html">คำขอ(ในเวลา)</a></div>
+            <div class="tab"><a href="user_requests_OutTime.html">คำขอ(นอกเวลา)</a></div>
+            <div class="tab active"><a href="user_approve.html">อนุมัติ </a></div>
+            <div class="tab"><a href="user_notapprove.html">ไม่อนุมัติ</a></div>
+            <div class="tab"><a href="user_outdate.html">คำขอหมดอายุ</a></div>
+            <div class="dropdown-container">
+                <select id="sorttime" class="form-select w-auto">
+                  <option value="">-- เรียงตามเวลา --</option>
+                  <option value="oldest">เวลาเก่าที่สุด</option>
+                  <option value="newest">เวลาใหม่ที่สุด</option>
+                  <option value="overlay">ช่วงเวลาคาบเกี่ยว</option>
+                </select>
+              </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th class="text-center">วันที่</th>
+                        <th class="text-center">ชื่อ-นามสกุล</th>
+                        <th class="text-center">อีเมล</th>
+                        <th class="text-center">ห้อง</th>
+                        <th class="text-center">จำนวนผู้ใช้</th>
+                        <th class="text-center">เวลาจอง</th>
+                        <th class="text-center">รายละเอียด</th>
+                        <th class="text-center">เหตุผลในการขอใช้งาน</th>
+                        <th class="text-center">การอนุมัติ</th>
+                    </tr>
+                </thead>
+                <tbody id ='rooms'>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+<!-- Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailModalLabel">รายละเอียดการจอง</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>วันที่:</strong> <span id="modal-date"></span></p>
+                <p><strong>ชื่อ-นามสกุล:</strong> <span id="modal-name"></span></p>
+                <p><strong>รายชื่อผู้ใช้งาน:</strong> <span id="modal-data-participant-names"></span></p>
+                <p><strong>อีเมล:</strong> <span id="modal-email"></span></p>
+                <p><strong>ห้อง:</strong> <span id="modal-room"></span></p>
+                <p><strong>วันที่จอง:</strong> <span id="modal-used_date"></span></p>
+                <p><strong>เวลาจอง:</strong> <span id="modal-time"></span></p>
+                <p><strong>อุปกรณ์ที่ขอยืม:</strong> <span id="modal-equipment"></span></p>
+                <p><strong>เหตุผลในการขอใช้งาน:</strong> <span id="modal-reason"></span></p>
+                <p><strong>เหตุผลเพิ่มเติม:</strong> <span id="modal-reason-detail"></span></p>
+                <p><strong>เหตุผลการปฏิเสธ:</strong> <span id="modal-data-reject"></span></p>
+                <p><strong>เหตุผลการปฏิเสธเพิ่มเติม:</strong> <span id="modal-data-reject-detail"></span></p>
+                <p><strong>ผู้อนุมัติ (ผู้ดูเเล):</strong> <span id="modal-approved-by"></span></p>
+                <p><strong>ผู้อนุมัติ (ผู้บริหาร):</strong> <span id="modal-approved-by_ex"></span></p>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+            </div>
+        </div>
+    </div>
+  </div>
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap Bundle with Popper -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script/TabBarFix.js"></script>    
+    <script src="script/UserRequest.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../script/config.js"></script>
+    <script src="../script/auth.js"></script>
+    
+</body>
+
+
+</html>

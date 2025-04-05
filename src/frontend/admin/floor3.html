@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Floor Layout</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background-color: #d9c1ab;
+    }
+
+    header {
+      background-color: #d9c1ab;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-bottom: 2px solid #000;
+    }
+
+    .floor-buttons {
+      display: flex;
+      gap: 15px;
+    }
+
+    .floor-buttons button {
+      background-color: #6c34a3;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .floor-buttons button:hover {
+      background-color: #563080;
+    }
+
+    main {
+      display: flex;
+      flex: 1;
+    }
+
+    .layout {
+      flex: 3;
+      background-color: white;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: repeat(7, 1fr);
+      grid-gap: 5px;
+      padding: 20px;
+      position: relative;
+      border: 2px solid #000;
+    }
+
+    .room {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+      text-align: center;
+      border: 2px solid #000;
+      border-radius: 10px;
+      background-color: red;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .room.red {
+      pointer-events: none;
+    }
+
+    .room:hover {
+      background-color: #f0ad4e;
+      transform: scale(1.1);
+    }
+
+    .room.large {
+      position: relative;
+      grid-column: 5 / span 2;
+      grid-row: 1 / span 2;
+      background-color: #8e8e8e;
+    }
+
+    .room.large::after {
+      content: "ไม่ว่าง";
+      /* Default content is "Not Available" */
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      background-color: red;
+      border: 2px solid white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 10px;
+      color: white;
+    }
+
+    .room.large.available::after {
+      content: "ว่าง";
+      /* Content changes to "Available" */
+      background-color: green;
+      /* Change color to green for available rooms */
+    }
+
+    .room.large.closed::after {
+      content: 'ซ่อม\Aบำรุง';
+      white-space: pre;
+      color: black;
+      background-color: #eed202;
+      border: 2px solid black;
+    }
+
+    .room.small {
+      position: relative;
+      grid-column: 5 / span 2;
+      grid-row: 1 / span 2;
+      background-color: #8e8e8e;
+    }
+
+    .room.small::after {
+      content: "ไม่ว่าง";
+      /* Default content is "Not Available" */
+      position: absolute;
+      top: 10px;
+      right: 7px;
+      width: 30px;
+      height: 30px;
+      background-color: red;
+      border: 2px solid white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 10px;
+      color: white;
+    }
+
+    .room.small.available::after {
+      content: "ว่าง";
+      /* Content changes to "Available" */
+      background-color: green;
+      /* Change color to green for available rooms */
+    }
+
+    .room.small.closed::after {
+      content: 'ซ่อม\Aบำรุง';
+      white-space: pre;
+      color: black;
+      background-color: #eed202;
+      border: 2px solid black;
+    }
+
+    .room.large.sc2-308 {
+      grid-column: 7 / span 2;
+      grid-row: 1 / span 2;
+      background-color: #8e8e8e;
+    }
+
+    .room.vertical_1 {
+      grid-row: span 2;
+    }
+
+    .room.vertical_2 {
+      grid-row: span 2;
+      grid-column: 10;
+    }
+
+    .room.vertical_3 {
+      grid-row: span 2;
+      grid-column: 11;
+    }
+
+    .room.vertical_4 {
+      grid-row: span 2;
+      grid-column: 12;
+    }
+
+    .room.vertical_5 {
+      grid-row: 6 / span 2;
+      grid-column: 1 / span 1;
+    }
+
+    .room.vertical_6 {
+      grid-row: 6 / span 2;
+      grid-column: 2 / span 1;
+    }
+
+    .room.vertical_7 {
+      grid-row: 6 / span 2;
+      grid-column: 3 / span 1;
+    }
+
+    .room.vertical_8 {
+      grid-row: 6 / span 2;
+      grid-column: 5 / span 1;
+      background-color: gray;
+    }
+
+    .room.vertical_9 {
+      grid-row: 6 / span 2;
+      grid-column: 6 / span 1;
+      background-color: gray;
+    }
+
+    .room.vertical_10.room.large.sc2-313 {
+      grid-column: 7 / span 2;
+      grid-row: 6 / span 2;
+      background-color: gray;
+    }
+
+    .room.vertical_11.room.large.sc2-311 {
+      grid-column: 11 / span 2;
+      grid-row: 6 / span 2;
+      background-color: gray;
+    }
+
+    .sidebar {
+      flex: 1;
+      background-color: #f8f9fa;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      border-left: 2px solid #000;
+      border: 2px solid #000;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .categories {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 20px;
+    }
+
+    .categories li {
+      cursor: pointer;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid #000000;
+      border-radius: 51px;
+      background-color: #fff;
+    }
+
+    .categories li span {
+      background-color: #eb0f0f;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 20px;
+    }
+
+    .categories li:hover {
+      background-color: #ddd;
+    }
+
+    .reports {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+
+    .report {
+      background-color: #fff3cd;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ffeeba;
+      border-radius: 5px;
+      border: 1px solid #000000;
+    }
+
+    .search-bar input {
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .logout {
+      text-align: center;
+    }
+
+    .logout button {
+      background-color: red;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .logout button:hover {
+      background-color: #c9302c;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      /* Hidden by default */
+      position: fixed;
+      /* Stay in place */
+      z-index: 1;
+      /* Sit on top */
+      left: 0;
+      top: 0;
+      width: 100%;
+      /* Full width */
+      height: 100%;
+      /* Full height */
+      background-color: rgba(0, 0, 0, 0.5);
+      /* Black with opacity */
+      padding-top: 60px;
+      /* Padding to center the modal */
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: auto;
+      padding: 15px;
+      border: 1px solid #888;
+      width: 50%;
+      border-radius: 10px;
+      max-width: flex;
+
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #6c34a3;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #563080;
+    }
+
+    header {
+      background-color: #d9c1ab;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      border-bottom: 2px solid #000;
+    }
+
+    .floor-buttons {
+      display: flex;
+      gap: 15px;
+    }
+
+    .report-buttons {
+      display: flex;
+      gap: 15px;
+      margin-left: auto;
+      /* Push this container to the right /
+}
+
+.logout-button {
+  margin-left: 15px; / Add some spacing between the report buttons and the logout button */
+    }
+
+    .floor-buttons button {
+      background-color: #6c34a3;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .floor-buttons button:hover {
+      background-color: #563080;
+    }
+
+    .floor-buttons button:active {
+      box-shadow: inset 0px 4px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    .report-buttons button {
+      background-color: rgb(37, 196, 37);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .report-buttons button:hover {
+      background-color: rgb(30, 170, 30);
+    }
+
+    .report-buttons button:active {
+      box-shadow: inset 0px 4px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    .logout-button button {
+      background-color: orange;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .logout-button button:hover {
+      background-color: orange;
+    }
+
+    .logout-button button:active {
+      box-shadow: inset 0px 4px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    .logout-button button:hover {
+      background-color: rgb(179, 117, 0);
+    }
+
+    .logout-button {
+      margin-left: 15px;
+      /* Add some spacing between the report buttons and the logout button */
+    }
+
+    #roomDetailsButton {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #009E60;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #roomDetailsButton:hover {
+      background-color: #40826D;
+    }
+
+    #scheduleContent {
+      margin-top: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="floor-buttons">
+      <a href="floor2.html"><button>ชั้น 2</button></a>
+      <a href="floor3.html"><button>ชั้น 3</button></a>
+      <a href="Index.html"><button>ชั้น 4</button></a>
+    </div>
+    <div class="report-buttons">
+      <a href="user_requests_InTime.html"><button>คำร้องขอใช้งานห้อง</button></a>
+      <a href="request_crash_equipments.html"><button>รายงานอุปกรณ์ชำรุด</button></a>
+    </div>
+    <div class="logout-button">
+      <button onclick="logout()" class="btn btn-warning">ออกจากระบบ</button></div>
+    </div>
+  </header>
+  <main>
+    <div class="layout">
+      <div class="room red vertical_1">SC2-304</div>
+      <div class="room red vertical_1">SC2-305</div>
+      <div class="room red vertical_1">SC2-306</div>
+      <div class="room large" id="SC2-307" onclick="manageRoom('SC2-307')">
+        SC2-307
+      </div>
+      <div class="room large sc2-308" id="SC2-308" onclick="manageRoom('SC2-308')">
+        SC2-308
+      </div>
+      <div class="room red vertical_2">ห้องน้ำ</div>
+      <div class="room red vertical_3">ห้องน้ำ</div>
+      <div class="room red vertical_4">SC2-310</div>
+      <div class="room red vertical_5">SC2-301</div>
+      <div class="room red vertical_6">SC2-302</div>
+      <div class="room red vertical_7">SC2-303</div>
+      <div class="room vertical_8 small" id="SC2-314" onclick="manageRoom('SC2-314')">
+        SC2-314
+      </div>
+      <div class="room vertical_9 small" id="SC2-313-1" onclick="manageRoom('SC2-313-1')">
+        SC2-313-1
+      </div>
+      <div class="room vertical_10 room large sc2-313" id="SC2-313" onclick="manageRoom('SC2-313')">
+        SC2-313
+      </div>
+      <div class="room vertical_11 room large sc2-311" id="SC2-311" onclick="manageRoom('SC2-311')">
+        SC2-311
+      </div>
+    </div>
+
+    <!-- Modal (Popup) <div id="scheduleContent">Loading...</div>-->
+    
+    <div id="roomModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="roomDetailTitle">Room Details</h2>
+         <!-- เพิ่มส่วนนี้ -->
+        <button id="roomDetailsButton">รายละเอียดภายในห้อง</button>
+        <button id="scheduleButton">ตารางการใช้ห้อง</button>
+        <div>
+          <label for="status">สถานะห้อง :</label>
+          <select id="status">
+            <option value="available">เปิดการใช้งาน</option>
+            <option value="not-available">ปิดการใช้งาน</option>
+          </select>
+        </div>
+        <button id="saveStatus">Save Status</button>
+      </div>
+    </div>
+  </main>
+  <script src="CheckStatus.js"></script>      
+
+  <script>
+    // Modal references
+    const modal = document.getElementById("roomModal");
+    const closeModal = document.querySelector(".close");
+    const saveStatusButton = document.getElementById("saveStatus");
+    const statusSelect = document.getElementById("status");
+    const roomDetailTitle = document.getElementById("roomDetailTitle");
+
+
+
+
+
+    // Global variable to store the current room element being edited
+    let currentRoomElement = null;
+
+    /*async function loadSchedule(roomId) {
+      const scheduleContent = document.getElementById("scheduleContent");
+      let fileName = "";
+
+      // ใช้ if...else เพื่อเลือกไฟล์สำหรับแต่ละห้อง
+      if (roomId === "SC2-308") {
+        fileName = "schedule308.html";
+      } else if (roomId === "SC2-307") {
+        fileName = "schedule307.html";
+      } else if (roomId === "SC2-311") {
+        fileName = "schedule311.html";
+      } else {
+        scheduleContent.innerHTML = `<p>ไม่มีตารางสำหรับห้อง ${roomId}</p>`;
+        return; // ถ้าไม่มีตารางสำหรับห้องนั้น ให้หยุดทำงาน
+      }
+
+      try {
+        // โหลดไฟล์ HTML
+        const response = await fetch(fileName);
+        if (!response.ok) throw new Error("ไม่สามารถโหลดไฟล์ได้");
+        const content = await response.text();
+
+        // แสดงเนื้อหาใน modal
+        scheduleContent.innerHTML = content;
+      } catch (error) {
+        scheduleContent.innerHTML = `<p>เกิดข้อผิดพลาด: ${error.message}</p>`;
+      }
+    }*/
+
+
+    // Open the modal and display the room details
+    function manageRoom(roomId) {
+      currentRoomElement = document.getElementById(roomId);
+      const roomName = currentRoomElement.innerText;
+
+      // ตั้งชื่อหัวข้อ
+      roomDetailTitle.innerText = `รายละเอียดห้อง: ${roomName}`;
+
+      // โหลดตารางการใช้งาน
+      //loadSchedule(roomId);
+
+      // Determine current status (Available/Not Available)
+      const currentStatus = currentRoomElement.classList.contains('available') ? 'available' : 'not-available';
+      statusSelect.value = currentStatus === 'available' ? 'available' : 'not-available';
+
+      // Show the modal
+      modal.style.display = "block";
+
+      // Set schedule button onclick actions for each room
+
+      // กำหนดให้ scheduleButton ไปยังหน้า schedule ของห้องต่างๆ
+      const scheduleButton = document.getElementById("scheduleButton");
+      const numericId = roomId.replace("SC2-", ""); // ✅ เหลือไว้แค่บรรทัดนี้
+
+      // ✅ ใช้ numericId ใน if เช็คตารางห้อง
+      if (numericId === '307') {
+        scheduleButton.onclick = () => window.location.href = "Schedule307.html";
+      } else if (numericId === '308') {
+        scheduleButton.onclick = () => window.location.href = "Schedule308.html";
+      } else if (numericId === '314') {
+        scheduleButton.onclick = () => window.location.href = "Schedule314.html";
+      } else if (numericId === '313-1') {
+        scheduleButton.onclick = () => window.location.href = "Schedule313-1.html";
+      } else if (numericId === '313') {
+        scheduleButton.onclick = () => window.location.href = "Schedule313.html";
+      } else if (numericId === '311') {
+        scheduleButton.onclick = () => window.location.href = "Schedule311.html";
+      }
+
+      // ✅ ปุ่มไปยังหน้ารายละเอียดห้อง
+      const roomPage = "Room_Detail.html";
+      const roomIdsForDetails = ['307', '308', '311', '313', '313-1', '314'];
+
+      document.getElementById("roomDetailsButton").onclick = function () {
+        if (roomIdsForDetails.includes(numericId)) {
+          window.location.href = `${roomPage}?room=${numericId}`;
+        } else {
+          alert("ไม่มีข้อมูลสำหรับห้องนี้");
+        }
+      };
+    }
+
+
+
+
+
+
+
+    // Save the room status and update the room element
+    saveStatusButton.onclick = async function () {
+  const selectedStatus = statusSelect.value;
+
+  // เปลี่ยน class เพื่อแสดงผลหน้า UI
+  if (selectedStatus === "available") {
+    currentRoomElement.classList.add("available");
+    currentRoomElement.classList.remove("not-available", "closed");
+  } else if (selectedStatus === "not-available") {
+    currentRoomElement.classList.add("not-available");
+    currentRoomElement.classList.remove("available", "closed");
+  } else if (selectedStatus === "closed") {
+    currentRoomElement.classList.add("closed");
+    currentRoomElement.classList.remove("available", "not-available");
+  }
+
+  // 🟢 เรียก API ไปยัง backend เพื่ออัปเดต room_status
+  const roomName = currentRoomElement.innerText.split(" ")[0]; // เช่น SC2-307
+  const statusText =
+    selectedStatus === "available"
+      ? "เปิดการใช้งาน"
+      : "ปิดการใช้งาน";
+
+  try {
+    const res = await fetch(`${API_URL}/admin/updateRoomStatus`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        room_name: roomName,
+        room_status: statusText,
+      }),
+    });
+
+    const result = await res.json();
+    if (res.ok) {
+      alert("✅ อัปเดตสถานะห้องสำเร็จ");
+    } else {
+      alert("❌ อัปเดตไม่สำเร็จ: " + result.message);
+    }
+  } catch (err) {
+    console.error("❌ Error:", err);
+    alert("เกิดข้อผิดพลาด");
+  }
+
+  modal.style.display = "none";
+};
+
+
+    // Close the modal
+    closeModal.onclick = function () {
+      modal.style.display = "none";
+    };
+
+    // Close the modal if clicked outside of it
+    window.onclick = function (event) {
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    };
+
+    // Load room status from localStorage when the page reloads
+    window.onload = async function () {
+  try {
+    const response = await fetch(`${API_URL}/admin/data/room`);
+    const roomStatuses = await response.json();
+
+    const rooms = document.querySelectorAll(".room");
+
+    rooms.forEach(room => {
+      const roomName = room.innerText.trim().split(" ")[0]; // เช่น SC2-307
+      const statusData = roomStatuses.find(r => r.room_name === roomName);
+
+      if (statusData) {
+        if (statusData.room_status === "เปิดการใช้งาน") {
+          room.classList.add("available");
+          room.classList.remove("not-available", "closed");
+        } else if (statusData.room_status === "ปิดการใช้งาน") {
+          room.classList.add("not-available");
+          room.classList.remove("available", "closed");
+        } else if (statusData.room_status === "ซ่อมบำรุง") {
+          room.classList.add("closed");
+          room.classList.remove("available", "not-available");
+        }
+      }
+    });
+  } catch (err) {
+    console.error("❌ ไม่สามารถโหลดสถานะห้องจากฐานข้อมูลได้:", err);
+  }
+};
+
+
+    // อ้างอิงถึง search input และ reports container
+    const searchInput = document.getElementById("searchInput");
+    const reportsContainer = document.querySelector(".reports");
+    const reportItems = document.querySelectorAll(".report");
+
+    // เพิ่ม event listener สำหรับการค้นหา
+    searchInput.addEventListener("input", function () {
+      const query = searchInput.value.toLowerCase();
+
+      reportItems.forEach((report) => {
+        const reportText = report.textContent.toLowerCase();
+
+        // แสดงเฉพาะรายการที่ตรงกับคำค้นหา
+        if (reportText.includes(query)) {
+          report.style.display = "block";
+        } else {
+          report.style.display = "none";
+        }
+      });
+    });
+  </script>
+  <script>
+    const categories = document.querySelectorAll(".categories li");
+    const reports = document.querySelectorAll(".reports .report");
+
+    // Add click event listener to each category item
+    categories.forEach((category) => {
+      category.addEventListener("click", () => {
+        // Toggle active class on the category
+        category.classList.toggle("active");
+
+        // Get the category ID from data-category attribute
+        const categoryId = category.getAttribute("data-category");
+
+        // Show or hide reports based on the clicked category
+        reports.forEach((report) => {
+          if (report.getAttribute("data-category") === categoryId) {
+            // Toggle visibility of the selected category reports
+            if (category.classList.contains("active")) {
+              report.style.display = "block"; // Show the report
+            } else {
+              report.style.display = "none"; // Hide the report
+            }
+          } else {
+            // Always hide reports that don't match the selected category
+            report.style.display = "none";
+          }
+        });
+      });
+    });
+  </script>
+    <script src="../script/config.js"></script>
+    <script src="../script/auth.js"></script>  
+</body>
+
+</html>

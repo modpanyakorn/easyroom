@@ -7,6 +7,8 @@ const fs = require("fs");
 const session = require("express-session");
 const http = require("http");
 const { Server } = require("socket.io");
+const cron = require('node-cron');
+const { autoExpireRequests } = require("./auto_status_expired");
 
 const app = express();
 const server = http.createServer(app);
@@ -16,6 +18,11 @@ const io = new Server(server, {
     // origin: ["http://localhost:5501", "http://localhost:3000"],
     credentials: true,
   },
+});
+//Auto update status
+cron.schedule("*/1 * * * *", async () => {//ปรับเวลาตรงนี้นะ :)
+  console.log("⏰ Running autoExpireRequests...");
+  await autoExpireRequests();
 });
 
 // Middleware
