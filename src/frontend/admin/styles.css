@@ -1,0 +1,398 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #d9c1ab;
+}
+
+header {
+  background-color: #d9c1ab;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid #000;
+}
+
+.floor-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.report-buttons {
+  display: flex;
+  gap: 15px;
+  margin-left: auto; /* Push this container to the right */
+}
+
+.logout-button {
+  margin-left: 15px; /* Add some spacing between the report buttons and the logout button */
+}
+
+.floor-buttons button {
+  background-color: #6c34a3;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.floor-buttons button:hover {
+  background-color: #563080;
+}
+
+.floor-buttons button:active {
+  box-shadow: inset 0px 4px 6px rgba(0, 0, 0, 0.4);
+}
+
+.report-buttons button {
+  background-color: rgb(37, 196, 37);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.report-buttons button:hover {
+  background-color: rgb(30, 170, 30);
+}
+
+.report-buttons button:active {
+  box-shadow: inset 0px 4px 6px rgba(0, 0, 0, 0.4);
+}
+
+.logout-button button {
+  background-color: orange;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.logout-button button:hover {
+  background-color: rgb(179, 117, 0);
+}
+
+.logout-button button:active {
+  box-shadow: inset 0px 4px 6px rgba(0, 0, 0, 0.4);
+}
+
+main {
+  display: flex;
+  flex: 1;
+}
+
+.layout {
+  flex: 3;
+  background-color: white;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(7, 1fr);
+  grid-gap: 5px;
+  padding: 20px;
+  position: relative;
+  border: 2px solid #000;
+}
+
+.room {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  text-align: center;
+  border: 2px solid #000;
+  border-radius: 10px;
+  background-color: red;
+  color: white;
+}
+
+.room.large {
+  position: relative;
+  grid-column: 2 / span 2;
+  grid-row: 1 / span 2;
+  background-color: red;
+}
+
+.room.largeDown1 {
+  position: relative;
+  grid-column: 6 / span 2;
+  grid-row: 6 / span 2;
+  background-color: red;
+}
+
+.room.largeDown2 {
+  position: relative;
+  grid-column: 8 / span 2;
+  grid-row: 6 / span 2;
+  background-color: #8e8e8e;
+}
+
+.room.largeDown2::after {
+  content: 'ไม่ว่าง';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  background-color: red;
+  border: 2px solid white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
+  color: white;
+}
+
+.room.largeDown2.available::after {
+  content: 'ว่าง';
+  background-color: green;
+}
+
+.room.largeDown2.closed::after {
+  content: 'ซ่อม\Aบำรุง'; /* Using '\A' for a new line */
+  white-space: pre; /* Ensures '\A' is interpreted as a new line */
+  color: black;
+  background-color: #eed202;
+  border: 2px solid black;
+}
+
+.room.large1 {
+  position: relative;
+  grid-column: 6 / span 2;
+  grid-row: 1 / span 2;
+  background-color: #8e8e8e;
+}
+
+.room.large1::after {
+  content: 'ไม่ว่าง';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  background-color: red;
+  border: 2px solid white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
+  color: white;
+}
+
+.room.large1.available::after {
+  content: 'ว่าง';
+  background-color: green;
+}
+
+.room.large1.closed::after {
+  content: 'ซ่อม\Aบำรุง'; /* Using '\A' for a new line */
+  white-space: pre; /* Ensures '\A' is interpreted as a new line */
+  color: black;
+  background-color: #eed202;
+  border: 2px solid black;
+}
+
+.room.small {
+  position: relative;
+  grid-column: 4 / span 1;
+  grid-row: 1 / span 1;
+  background-color: red;
+}
+
+.room.smallDown {
+  position: relative;
+  grid-column: span 1;
+  grid-row: 7 / span 1;
+  background-color: red;
+}
+
+.room.small1 {
+  grid-column: 9 / span 1;
+  grid-row: 1 / span 1;
+  background-color: red;
+}
+
+.room.small2 {
+  grid-column: 9 / span 1;
+  grid-row: 2 / span 1;
+  background-color: red;
+}
+
+.room.small4 {
+  grid-column: 11 / span 1;
+  grid-row: 2 / span 1;
+  background-color: red;
+}
+
+.room.vertical {
+  position: relative;
+  grid-row: span 2;
+  background-color: #8e8e8e
+}
+
+.room.vertical::after {
+  content: 'ไม่ว่าง'; /* Displayed as "Not Available" in Thai */
+  position: absolute;
+  top: 10px;
+  right: 7px;
+  width: 30px;
+  height: 30px;
+  background-color: red;
+  border: 2px solid white;
+  border-radius: 50%; /* Makes it a circle */
+  display: flex; /* Enable flexbox for centering */
+  justify-content: center; /* Center text horizontally */
+  align-items: center; /* Center text vertically */
+  font-size: 10px; /* Adjust font size if needed */
+  color: white; /* Ensure text is visi /* Makes it a circle */
+}
+
+.room.vertical.available::after {
+  content: 'ว่าง';
+  background-color: green;
+}
+
+.room.vertical.closed::after {
+  content: 'ซ่อม\Aบำรุง'; /* Using '\A' for a new line */
+  white-space: pre; /* Ensures '\A' is interpreted as a new line */
+  color: black;
+  background-color: #eed202;
+  border: 2px solid black;
+}
+
+.room.vertical1 {
+  position: relative;
+  grid-column: 8 / span 1;
+  grid-row: span 2;
+  background-color: #8e8e8e;
+}
+
+.room.vertical1::after {
+  content: 'ไม่ว่าง'; /* Displayed as "Not Available" in Thai */
+  position: absolute;
+  top: 10px;
+  right: 7px;
+  width: 30px;
+  height: 30px;
+  background-color: red;
+  border: 2px solid white;
+  border-radius: 50%; /* Makes it a circle */
+  display: flex; /* Enable flexbox for centering */
+  justify-content: center; /* Center text horizontally */
+  align-items: center; /* Center text vertically */
+  font-size: 10px; /* Adjust font size if needed */
+  color: white; /* Ensure text is visi /* Makes it a circle */
+}
+
+.room.vertical1.available::after {
+  content: 'ว่าง';
+  background-color: green;
+}
+
+.room.vertical1.closed::after {
+  content: 'ซ่อม\Aบำรุง'; /* Using '\A' for a new line */
+  white-space: pre; /* Ensures '\A' is interpreted as a new line */
+  color: black;
+  background-color: #eed202;
+  border: 2px solid black;
+}
+
+.room.vertical2{
+  grid-column: 10 / span 1;
+  grid-row: 1 / span 2;
+  background-color: red;
+}
+
+.room.vertical1Down {
+  grid-column: span 1;
+  grid-row: 6 / span 2;
+  background-color: red;
+}
+
+.available {
+  background-color: #5cb85c;
+}
+
+.spacer {
+  background-color: transparent;
+  border: none;
+}
+
+.modal {
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  /* Stay in place */
+  z-index: 1;
+  /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  background-color: rgba(0, 0, 0, 0.5);
+  /* Black with opacity */
+  padding-top: 60px;
+  /* Padding to center the modal */
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  /* Could be more or less, depending on screen size */
+  border-radius: 10px;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #6c34a3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #563080;
+}
+
+#roomDetailsButton {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: 	#009E60;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#roomDetailsButton:hover {
+  background-color: #40826D;
+}
