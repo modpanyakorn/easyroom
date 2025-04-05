@@ -286,40 +286,85 @@ showChart("day");
 
 //mostuser
 
-fetch(`${window.CONFIG.API_URL}/executive/useralldata`)
-.then(response => response.json()) // แปลงเป็น JSON
-.then(data => {
-  const userList = document.getElementById("userList");
-  userList.innerHTML = "";  // ล้างข้อความเดิม
+// ฟังก์ชันที่โหลดข้อมูลห้องและบทบาทจาก API
+function loadRoomAndRoleData() {
+    fetch(`${window.CONFIG.API_URL}/executive/getRoomsAndRoles`)  // ดึงข้อมูลห้องจาก API
+        .then(response => response.json())
+        .then(data => {
+            // กรองห้องที่ซ้ำกัน
+            const uniqueRooms = new Set();
+            const rooms = data.rooms.filter(room => {
+                if (uniqueRooms.has(room.room_id)) {
+                    return false;  // ถ้าห้องนี้ซ้ำแล้ว, ไม่ใส่ในรายการ
+                } else {
+                    uniqueRooms.add(room.room_id);  // ถ้าไม่ซ้ำ, เพิ่มห้องลงใน Set
+                    return true;
+                }
+            });
 
-  data.forEach(user => {
-    const div = document.createElement("div");
-    div.className = "split-container";
-    div.innerHTML = `<p>${user.name}</p> <p>${user.stat} ครั้ง</p>`;
-    userList.appendChild(div);
-  });
-})
-.catch(error => {
-  console.error("เกิดข้อผิดพลาด:", error);
-  document.getElementById("userList").innerHTML = "ไม่สามารถโหลดข้อมูลได้";
-});
+            // เติมห้องใน dropdown
+            const roomSelect = document.getElementById("room");
+            rooms.forEach(room => {
+                const option = document.createElement("option");
+                option.value = room.room_id;  // ใช้ room.room_id
+                option.textContent = room.room_id;  // ใช้ room.label
+                roomSelect.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error("เกิดข้อผิดพลาดในการโหลดห้อง:", error);
+        });
+}
 
-fetch(`${window.CONFIG.API_URL}/executive/mostreport`)
-.then(response => response.json()) // แปลงเป็น JSON
-.then(data => {
-  const userList = document.getElementById("ReportList");
-  userList.innerHTML = "";  // ล้างข้อความเดิม
 
-  data.forEach(user => {
-    const div = document.createElement("div");
-    div.className = "split-container";
-    div.innerHTML = `<p>${user.name}</p> <p>${user.stat} ครั้ง</p>`;
-    userList.appendChild(div);
-  });
-})
-.catch(error => {
-  console.error("เกิดข้อผิดพลาด:", error);
-  document.getElementById("userList").innerHTML = "ไม่สามารถโหลดข้อมูลได้";
+
+
+// ฟังก์ชันที่ดึงข้อมูลผู้ใช้งานจาก API
+function fetchUserData(room, role) {
+    const url = new URL(`${window.CONFIG.API_URL}/executive/useralldata`);
+    const params = new URLSearchParams();
+
+    // เพิ่มฟิลเตอร์ที่เลือกไปใน query string
+    if (room) {
+        params.append('room', room);
+    }
+    if (role) {
+        params.append('role', role);
+    }
+
+    url.search = params.toString();  // เพิ่มพารามิเตอร์ใน URL
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            const userList = document.getElementById("userList");
+            userList.innerHTML = "";  // ล้างข้อมูลเดิม
+
+            // แสดงข้อมูลที่ดึงมา
+            data.forEach(user => {
+                const div = document.createElement("div");
+                div.className = "split-container";
+                div.innerHTML = `<p>${user.name}</p> <p>${user.stat} ครั้ง</p>`;
+                userList.appendChild(div);
+            });
+        })
+        .catch(error => {
+            console.error("เกิดข้อผิดพลาด:", error);
+            document.getElementById("userList").innerHTML = "ไม่สามารถโหลดข้อมูลได้";
+        });
+}
+
+// ฟังก์ชันที่ถูกเรียกเมื่อผู้ใช้เลือกฟิลเตอร์แล้วคลิกกรอง
+function applyFilters() {
+    const room = document.getElementById("room").value;  // รับค่าห้องที่เลือก
+    const role = document.getElementById("role").value;  // รับค่าบทบาทที่เลือก
+    fetchUserData(room, role);  // เรียกฟังก์ชันที่ดึงข้อมูลจาก API ตามฟิลเตอร์
+}
+
+// เรียกใช้ฟังก์ชันเมื่อหน้าโหลดเพื่อให้ข้อมูลแสดง
+document.addEventListener("DOMContentLoaded", function() {
+    loadRoomAndRoleData();  // โหลดข้อมูลห้องและบทบาทเมื่อหน้าโหลด
+    applyFilters();  // ดึงข้อมูลเริ่มต้นเมื่อโหลดหน้า
 });
 
 //most booking room card
@@ -558,5 +603,4 @@ new Chart(ctx, {
 });
 })
 .catch(error => console.error("❌ Error fetching data:", error));
-
 

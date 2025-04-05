@@ -38,5 +38,6 @@ router.get("/detailPop",controller.detailsPop);
 router.get("equipment_brokened",controller.equipment_brokened);
 router.get("/RejectReasons",controller.RejectReasons);
 router.get("/submitRejection",controller.submitRejection);
+router.get("/getRoomsAndRoles",controller.getRoomsAndRoles);
 
 module.exports = router;

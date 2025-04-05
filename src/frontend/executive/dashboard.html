@@ -108,17 +108,55 @@
             <div class="statistics-card">
                 <h6 style="text-align: center;">นิสิตที่จองใช้งานห้องบ่อยที่สุด</h6>
                 <section style="margin-top: 40px;">
+                    <!-- ฟอร์มเลือกห้องและบทบาท -->
+                    <div class="filters">
+                        <label for="room">เลือกห้อง:</label>
+                        <select id="room" name="room">
+                            <!-- ตัวเลือกห้องจะถูกเติมจาก API -->
+                            <option value="">ทั้งหมด</option>  <!-- ให้เลือกทั้งหมดเป็นค่าเริ่มต้น -->
+                        </select>
+                        
+                        <label for="role">เลือกบทบาท:</label>
+                        <select id="role" name="role">
+                            <option value="">ทั้งหมด</option>
+                            <option value="student">นิสิต</option>
+                            <option value="teacher">อาจารย์</option>
+                        </select>
+                        
+                        <!-- ปุ่มกรอง -->
+                        <button onclick="applyFilters()">กรองข้อมูล</button>
+                    </div>
+                    
+                    <!-- แสดงข้อมูลผู้ใช้งาน -->
                     <section id="userList">
+                        <!-- ข้อมูลจะถูกแสดงที่นี่ -->
                     </section>
+                    
+                    <!-- ปุ่มไปที่หน้ารายละเอียด -->
                     <button class="details-btn" onclick="window.location.href='student.html'">Details</button>
+                </section>
             </div>
+            
+            
             <div class="statistics-card">
                 <h6 style="text-align: center;">นิสิตที่แจ้งซ่อมอุปกรณ์บ่อยที่สุด</h6>
-                <section style="margin-top: 40px;">
-                    <section id="ReportList">
-                    </section>
-                    <button class="details-btn" onclick="window.location.href='reporttable.html'">Details</button>
+
+                <div style="margin-top: 20px; text-align: center;">
+                    <label for="roleFilter">บทบาท:</label>
+                    <select id="roleFilter">
+                        <option value="">ทั้งหมด</option>
+                        <option value="student">นิสิต</option>
+                        <option value="teacher">อาจารย์</option>
+                    </select>
+
+                    <button onclick="loadTopReporters()" style="margin-left: 10px;">ค้นหา</button>
+                </div>
+
+                <section id="ReportList" style="margin-top: 20px;"></section>
+
+                <button class="details-btn" onclick="window.location.href='reporttable.html'">Details</button>
             </div>
+
         </div>
 
     </div>
@@ -139,6 +177,44 @@
             btnStats.classList.add("btn-sidebar-active");
         })
         .catch((err) => console.error("Failed to load sidebar:", err));
+
+    function loadTopReporters() {
+        const role = document.getElementById("roleFilter").value;
+        let url = `${window.CONFIG.API_URL}/executive/mostreport`;
+
+        if (role) {
+            url += `?role=${role}`;
+        }
+
+        fetch(url)
+            .then(response => response.json()) // แปลงเป็น JSON
+            .then(data => {
+                const userList = document.getElementById("ReportList");
+                userList.innerHTML = "";  // ล้างข้อมูลเก่า
+
+                if (data.length === 0) {
+                    userList.innerHTML = "<p>ไม่พบข้อมูล</p>";
+                    return;
+                }
+
+                data.forEach(user => {
+                    const div = document.createElement("div");
+                    div.className = "split-container";
+                    div.innerHTML = `<p>${user.name}</p> <p>${user.stat} ครั้ง</p>`;
+                    userList.appendChild(div);
+                });
+            })
+            .catch(error => {
+                console.error("เกิดข้อผิดพลาด:", error);
+                document.getElementById("ReportList").innerHTML = "ไม่สามารถโหลดข้อมูลได้";
+            });
+    }
+
+    // เรียกฟังก์ชันทันทีเมื่อโหลดหน้า (แสดงทั้งหมด)
+    document.addEventListener("DOMContentLoaded", () => {
+        loadTopReporters();
+    });
+
 </script>
     <script src="../script/config.js"></script>
     <script src="../script/auth.js"></script>
