@@ -50,7 +50,7 @@ async function fetchData() {
                         equipmentType: equipment?.equipment_type || '-',
                         admin: admin?.full_name || '-',
                         damageDetails: row?.damage_details || '-',
-                        imagePath: row?.image_path ? `${API_URL}/admin/image/${row.image_path}` : null // ✅ เชื่อม `image_path`
+                        imagePath: row?.image_path ? `${API_URL}/storage/equipment_img/${row.image_path}` : null // ✅ เชื่อม `image_path`
                     };
                 } catch (error) {
                     console.error("❌ Error mapping row:", row, error);
