@@ -1,3 +1,27 @@
+fetch("sidebar.html")
+  .then((resp) => resp.text())
+  .then((html) => {
+    // แทรก Sidebar เข้ามา
+    document.getElementById("sidebar-container").innerHTML = html;
+  })
+  .then(() => {
+    // ✅ ให้ Highlight ปุ่มสถิติ (เช็กก่อนใช้)
+    const btnStats = document.getElementById("btnStatistic");
+    if (btnStats) {
+      btnStats.classList.add("btn-sidebar-active");
+    }
+
+    // ✅ ผูก event logout ใหม่ เพราะ sidebar ถูกโหลดแบบ dynamic
+    // const logoutBtns = document.querySelectorAll("logout.btn");
+    // logoutBtns.forEach((btn) => {
+    //   btn.addEventListener("click", window.auth.logout);
+    // });
+  })
+  .catch((err) => console.error("Failed to load sidebar:", err));
+
+
+
+
 let barChart = null; // ตัวแปรเก็บกราฟ
 let rooms = []; // เก็บข้อมูลห้องที่ได้จาก API
 
