@@ -59,41 +59,6 @@ function convertToThaiTime(utcDate) {
   return date.toISOString().slice(0, 10);
 }
 
-function showRejectNote(requestId, mode = "reject") {
-  const bookings = window.loadedBookingData || [];
-  const booking = bookings.find((b) => b.room_request_id === requestId);
-  if (!booking) {
-    alert("ไม่พบข้อมูลรายการนี้");
-    return;
-  }
-  let content = "";
-  if (mode === "reject") {
-    content = `
-        <p><strong>📍ห้องที่จอง : </strong> ${booking.room_name || "-"}</p>
-        <p><strong>เหตุผลที่ไม่อนุมัติ : </strong> ${
-          booking.reject_reason || "-"
-        }</p>
-        <p><strong>รายละเอียดเพิ่มเติม : </strong> ${
-          booking.detail_reject_reason || "-"
-        }</p>
-        <hr>
-        <p><strong>👤 ผู้อนุมัติ :</strong> ${
-          booking.admin_name || booking.executive_name
-        }</p>
-      `;
-  } else if (mode === "approve") {
-    content = `
-        <p><strong>📍ห้องที่จอง : </strong> ${booking.room_name || "-"}</p>
-        <p><strong>👤 ผู้อนุมัติ : </strong> ${
-          booking.admin_name || booking.executive_name
-        }</p>
-      `;
-  }
-  document.getElementById("rejectContent").innerHTML = content;
-  document.getElementById("rejectModal").style.display = "block";
-  document.getElementById("modalOverlay").style.display = "block";
-}
-
 function closeRejectModal() {
   document.getElementById("rejectModal").style.display = "none";
   document.getElementById("modalOverlay").style.display = "none";
@@ -117,7 +82,7 @@ async function cancelBooking(requestId) {
     title: "คุณต้องการยกเลิกการจองนี้ใช่หรือไม่?",
     icon: "warning",
     showCancelButton: true,
-    confirmButtonText: "ใช่ ต้องการยกเลิก",
+    confirmButtonText: "ตกลง",
     cancelButtonText: "ไม่",
   });
   if (!result.isConfirmed) return;
@@ -183,110 +148,172 @@ async function fetchBrokenEquipments() {
     brokenEquipments.forEach((item, index) => {
       console.log(`📌 เพิ่มแถวที่ ${index + 1}:`, item);
       const row = document.createElement("tr");
+
+      // ปรับสีของสถานะตามค่าของ repair_status
+      let statusColor = "black"; // สีเริ่มต้น
+      if (item.repair_status === "รอซ่อม") {
+        statusColor = "#FFBF00"; // สีสำหรับสถานะรอซ่อม
+      } else if (item.repair_status === "รับเรื่องแล้ว") {
+        statusColor = "green"; // สีสำหรับสถานะรับเรื่องแล้ว
+      } else if (item.repair_status === "กำลังจัดซื้อ") {
+        statusColor = "orange"; // สีสำหรับสถานะกำลังจัดซื้อ
+      } else if (item.repair_status === "กำลังซ่อม") {
+        statusColor = "orange"; // สีสำหรับสถานะกำลังซ่อม
+      } else if (item.repair_status === "ซ่อมสำเร็จ") {
+        statusColor = "green"; // สีสำหรับสถานะซ่อมสำเร็จ
+      } else if (item.repair_status === "ไม่สามารถซ่อมได้") {
+        statusColor = "red"; // สีสำหรับสถานะไม่สามารถซ่อมได้
+      }
+
+      // แสดงรูปภาพขนาดเล็กในตาราง (ถ้ามี)
+      const imagePreview = item.image_path
+        ? `<div class="image-preview-container"><img src="${API_URL}/booker/image/${item.image_path}" alt="รูปอุปกรณ์" class="image-preview"></div>`
+        : `<div class="no-image-preview">ไม่มีรูป</div>`;
+
       row.innerHTML = `
-      <td>${new Date(item.repair_date).toLocaleString("th-TH")}</td>
-                <td>${item.equipment_name || "-"}</td>
-                <td>${item.damage_details || "-"}</td>
-                <td>${item.room_id || "-"}</td>
-                <td>${item.Admin_Name}</td>
-                <td class="status">${item.repair_status || "-"}</td>
-                <td>
-                    <button class="detail-btn" onclick="showDetails(${index}, 'repair')">รายละเอียด</button>
-                    </td>
-            `;
+        <td>${new Date(item.repair_date).toLocaleString("th-TH")}</td>
+        <td>${item.equipment_name || "-"}</td>
+        <td>${item.damage_details || "-"}</td>
+        <td>SC2-${item.room_id || "-"}</td>
+        <td>${item.Admin_Name || "-"}</td>
+        <td class="status" style="color: ${statusColor}; font-weight: bold;">${
+        item.repair_status || "-"
+      }</td>
+        <td>
+            <button class="repair-detail-btn" onclick="showDetails(${index}, 'repair')">รายละเอียด</button>
+        </td>
+      `;
       tableBody.appendChild(row);
     });
     window.brokenEquipmentsData = brokenEquipments;
     console.log("✅ ตารางอัปเดตเรียบร้อย!");
-    setupReportTable(4, 5);
+    setupReportTable(4, 5); // เรียกฟังก์ชันที่ใช้สำหรับการแสดงเพิ่มเติมในตาราง
   } catch (error) {
     console.error("❌ เกิดข้อผิดพลาดในการโหลดข้อมูล:", error);
   }
 }
 
+// เพิ่มฟังก์ชันแสดงรูปภาพขนาดใหญ่ (อาจเรียกใช้เมื่อคลิกที่รูปในรายละเอียด)
+function showLargeImage(imageUrl) {
+  if (!imageUrl) return;
+
+  Swal.fire({
+    imageUrl: imageUrl,
+    imageAlt: "รูปอุปกรณ์ชำรุด",
+    width: 800,
+    showConfirmButton: false,
+    showCloseButton: true,
+    customClass: {
+      image: "large-equipment-image",
+    },
+  });
+}
+
+// ฟังก์ชันแสดงรายละเอียดการแจ้งซ่อม
 function showDetails(index, type) {
-  const modalTitle = document.getElementById("modalTitle");
-  const detailsContainer = document.getElementById("detailsContainer");
-  if (!modalTitle || !detailsContainer) {
-    console.error("❌ ไม่พบ element #modalTitle หรือ #detailsContainer");
-    return;
-  }
-  let detailsContent = "";
   if (type === "repair") {
     const item = window.brokenEquipmentsData[index];
     console.log("📌 ข้อมูลที่ดึงมา:", item);
     if (!item) {
       console.error("❌ ไม่พบข้อมูลสำหรับ index:", index);
+      Swal.fire({
+        icon: "error",
+        title: "ไม่พบข้อมูล",
+        text: "ไม่สามารถดึงข้อมูลรายละเอียดได้",
+        confirmButtonText: "ตกลง",
+      });
       return;
     }
+
+    // กำหนด URL ของรูปภาพ (ถ้ามี)
     let imageUrl = item.image_path
       ? `${API_URL}/booker/image/${item.image_path}`
       : "";
-    modalTitle.innerText = "รายละเอียดการแจ้งซ่อม";
-    detailsContent = `
-    ${
-      imageUrl
-        ? `<img src="${imageUrl}" alt="ภาพอุปกรณ์ที่เสียหาย" style="width: 100%; max-width: 400px; border-radius: 8px; margin-top: 10px;">`
-        : ""
+
+    // กำหนดสีของสถานะซ่อม
+    let statusColor = "black";
+    if (item.repair_status === "รอซ่อม") {
+      statusColor = "#FFBF00";
+    } else if (item.repair_status === "รับเรื่องแล้ว") {
+      statusColor = "green";
+    } else if (
+      item.repair_status === "กำลังจัดซื้อ" ||
+      item.repair_status === "กำลังซ่อม"
+    ) {
+      statusColor = "orange";
+    } else if (item.repair_status === "ซ่อมสำเร็จ") {
+      statusColor = "green";
+    } else if (item.repair_status === "ไม่สามารถซ่อมได้") {
+      statusColor = "red";
     }
-          <p><strong>🖥 ชื่ออุปกรณ์:</strong> ${item.equipment_name || "-"}</p>
-          <p><strong>🔍 รายละเอียดเพิ่มเติม:</strong> ${item.damage || "-"}</p>
-          <p><strong>🔍 ข้อความเพิ่มเติม:</strong> ${
-            item.damage_details || "-"
-          }</p>
-          <p><strong>📍 ห้อง:</strong> ${item.room_id || "-"}</p>
-          <p><strong>⚠️ สถานะ:</strong> ${item.repair_status || "-"}</p>
-          <p><strong>👤 ผู้รับแจ้งซ่อม:</strong> ${
-            item.Admin_Name || "รอผู้รับแจ้งซ่อม"
-          }</p>
-          <p><strong>📅 วันที่แจ้งซ่อม:</strong> ${new Date(
-            item.repair_date
-          ).toLocaleString("th-TH")}</p>
-      `;
-    console.log("📝 HTML ที่จะถูกแสดง:", detailsContent);
-  }
-  detailsContainer.innerHTML = detailsContent;
-  document.getElementById("modalOverlay").style.display = "block";
-  document.getElementById("detailsModal").style.display = "block";
-}
 
-function closeDetailsModal() {
-  document.getElementById("modalOverlay").style.display = "none";
-  document.getElementById("detailsModal").style.display = "none";
-  document.getElementById("rejectModal").style.display = "none";
-}
-
-function openDetailsModal(index) {
-  console.log("📌 เปิด Modal สำหรับ index:", index);
-  if (!window.brokenEquipmentsData || !window.brokenEquipmentsData[index]) {
-    console.error("❌ ไม่มีข้อมูลสำหรับ index:", index);
-    return;
-  }
-  const item = window.brokenEquipmentsData[index];
-  console.log("📌 ข้อมูลที่ดึงมา:", item);
-  const repairDate = new Date(item.Repair_date).toLocaleString("th-TH", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
-  const detailsContainer = document.getElementById("detailsContainer");
-  detailsContainer.innerHTML = `
-      <div class="details-container">
-      <div class="details-row"><strong>ผู้แจ้ง:</strong> ${item.Admin_Name}</div>
-          <div class="details-row"><strong>เวลาที่แจ้งซ่อม:</strong> ${repairDate}</div>
-          <div class="details-row"><strong>ชื่ออุปกรณ์:</strong> ${item.Equipments_name}</div>
-          <div class="details-row"><strong>รายละเอียด:</strong> ${item.Damaged_details}</div>
-          <div class="details-row"><strong>ห้อง:</strong> SC2-${item.Rooms_ID}</div>
-          <div class="details-row"><strong>ผู้รับแจ้งซ่อม:</strong> ${item.Admin_Name}</div>
-          <div class="details-row"><strong>สถานะ:</strong> ${item.Repair_status}</div>
+    // สร้าง HTML สำหรับแสดงรายละเอียด
+    let htmlContent = `
+      <div class="repair-details-container">
+        ${
+          imageUrl
+            ? `<div class="image-container">
+                <img src="${imageUrl}" alt="รูปอุปกรณ์ชำรุด" class="repair-image">
+                <div class="image-caption">รูปภาพอุปกรณ์ที่ชำรุด</div>
+              </div>`
+            : `<div class="no-image-container">
+                <div class="no-image-text">ไม่มีรูปภาพ</div>
+              </div>`
+        }
+        
+        <div class="details-section">
+          <div class="detail-row">
+            <div class="detail-label">🖥 ชื่ออุปกรณ์:</div>
+            <div class="detail-value">${item.equipment_name || "-"}</div>
           </div>
-          `;
-  console.log("📌 HTML ที่จะถูกแสดงใน Modal:", detailsContainer.innerHTML);
-  document.getElementById("modalOverlay").style.display = "block";
-  document.getElementById("detailsModal").style.display = "block";
+          <div class="detail-row">
+            <div class="detail-label">🔍 สาเหตุ:</div>
+            <div class="detail-value">${item.damage || "-"}</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-label">🔍 สาเหตุเพิ่มเติม:</div>
+            <div class="detail-value">${item.damage_details || "-"}</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-label">📍 ห้อง:</div>
+            <div class="detail-value">SC2-${item.room_id || "-"}</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-label">⚠️ สถานะ:</div>
+            <div class="detail-value" style="color: ${statusColor}; font-weight: bold;">${
+      item.repair_status || "-"
+    }</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-label">👤 ผู้รับแจ้งซ่อม:</div>
+            <div class="detail-value">${
+              item.Admin_Name || "รอผู้รับแจ้งซ่อม"
+            }</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-label">📅 วันที่แจ้งซ่อม:</div>
+            <div class="detail-value">${new Date(
+              item.repair_date
+            ).toLocaleString("th-TH")}</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // แสดง SweetAlert2 แบบปรับแต่ง
+    Swal.fire({
+      title: "รายละเอียดการแจ้งซ่อม",
+      html: htmlContent,
+      width: 800,
+      confirmButtonText: "ปิด",
+      customClass: {
+        popup: "my-swal-popup repair-popup",
+        confirmButton: "btn btn-secondary",
+      },
+      buttonsStyling: false,
+      showCloseButton: true,
+    });
+  }
 }
 
 function formatDate(isoString) {
@@ -307,6 +334,7 @@ async function fetchUserBookingData() {
     const userId = userSession.data?.user_id;
     console.log("🎯 userId ที่ใช้เรียก API:", userId);
     if (!userId) throw new Error("❌ ไม่พบ user_id");
+
     const response = await fetch(`${API_URL}/booker/userBookings/${userId}`);
     if (!response.ok) throw new Error("❌ ไม่สามารถดึงข้อมูลการจองได้");
     const bookings = await response.json();
@@ -334,6 +362,8 @@ async function fetchUserBookingData() {
           let statusText = statusCell.textContent.trim();
           if (statusText === "อนุมัติ") {
             statusCell.style.color = "green";
+          } else if (statusText === "คำขอหมดอายุ") {
+            statusCell.style.color = "gray";
           } else if (
             statusText === "ไม่อนุมัติ" ||
             statusText === "ยกเลิกการจอง"
@@ -347,7 +377,25 @@ async function fetchUserBookingData() {
           }
         });
       }, 1000);
-      //console.log("📌 request_status ที่ได้:", booking.request_status);
+
+      // สร้างปุ่มตามสถานะ
+      let actionButtons = "";
+
+      // เพิ่มปุ่มดูรายละเอียด (รวมข้อมูลหมายเหตุไว้ในรายละเอียดแล้ว)
+      const detailButton = `<button class="btn detail-btn btn-sm me-2" onclick="showBookingDetails(${booking.room_request_id})">รายละเอียด</button>`;
+
+      // เพิ่มปุ่มยกเลิกสำหรับสถานะที่เหมาะสม
+      if (
+        booking.request_status === "รอดำเนินการ" ||
+        booking.request_status === "รออนุมัติ"
+      ) {
+        actionButtons =
+          detailButton +
+          `<button class="btn cancel-btn btn-sm" onclick="cancelBooking(${booking.room_request_id})">ยกเลิกการจอง</button>`;
+      } else {
+        actionButtons = detailButton;
+      }
+
       row.innerHTML = `
         <td>${booking.request_type || "-"}</td>
         <td>${booking.room_name || "-"}</td>
@@ -356,19 +404,8 @@ async function fetchUserBookingData() {
         <td>${booking.start_time || "-"}</td>
         <td>${booking.end_time || "-"}</td>
         <td class="status">${booking.request_status || "-"}</td>
-        <td>
-            ${
-              booking.request_status === "รอดำเนินการ" ||
-              booking.request_status === "รออนุมัติ"
-                ? `<button class="btn cancel-btn btn-sm" onclick="cancelBooking(${booking.room_request_id})">ยกเลิก</button>`
-                : booking.request_status === "ไม่อนุมัติ"
-                ? `<button class="btn detail-btn btn-sm" onclick="showRejectNote(${booking.room_request_id}, 'reject')">หมายเหตุ</button>`
-                : booking.request_status === "อนุมัติ"
-                ? `<button class="btn detail-btn btn-sm" onclick="showRejectNote(${booking.room_request_id}, 'approve')">หมายเหตุ</button>`
-                : "-"
-            }
-        </td>
-    `;
+        <td>${actionButtons}</td>
+      `;
       tableBody.appendChild(row);
     });
     setupBookingTable(4, 5);
@@ -378,6 +415,173 @@ async function fetchUserBookingData() {
       "booking-table-body"
     ).innerHTML = `<tr><td colspan="8" style="text-align: center; color: red;">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>`;
   }
+}
+
+// ฟังก์ชันแสดงรายละเอียดการจอง
+// ฟังก์ชันแสดงรายละเอียดการจอง
+async function showBookingDetails(requestID) {
+  try {
+    // ดึงข้อมูลจาก API
+    const res = await fetch(`${API_URL}/executive/detailsPop`);
+    if (!res.ok) throw new Error("ไม่สามารถดึงข้อมูลได้");
+
+    const data = await res.json();
+    const booking = data.find((item) => item.requestID === requestID);
+
+    if (!booking) {
+      Swal.fire({
+        icon: "error",
+        title: "ไม่พบข้อมูลการจอง",
+        confirmButtonText: "ตกลง",
+        customClass: {
+          popup: "my-swal-popup",
+        },
+      });
+      return;
+    }
+
+    // ดึงรายละเอียดการจอง
+    const bookingRoomDetails = booking.detailbookingreason?.trim()
+      ? booking.detailbookingreason
+      : "ไม่มีข้อมูล";
+
+    // ดึงข้อมูลหมายเหตุ (จากปุ่มหมายเหตุเดิม)
+    const bookingData =
+      window.loadedBookingData?.find((b) => b.room_request_id === requestID) ||
+      {};
+    const status = bookingData.request_status || "-";
+
+    // สร้าง HTML สำหรับ SweetAlert2
+    let htmlContent = `
+      <div class="text-start">
+        <p><strong>📍 ห้องที่จอง:</strong> ${booking.roombooking}</p>
+        <p><strong>🕒 เวลาที่ใช้ห้อง:</strong> ${booking.timebooking}</p>
+        <p><strong>📊 สถานะ:</strong> <span style="color: ${getStatusColor(
+          status
+        )};">${status}</span></p>
+    `;
+
+    // เพิ่มส่วนข้อมูลผู้อนุมัติ (ถ้ามี)
+    if (bookingData.admin_name || bookingData.executive_name) {
+      htmlContent += `<p><strong>👤 ผู้อนุมัติ:</strong> ${
+        bookingData.admin_name || bookingData.executive_name
+      }</p>`;
+    } else {
+      htmlContent += `<p><strong>👤 ผู้อนุมัติ:</strong> <i>รอการอนุมัติ</i></p>`;
+    }
+
+    // เพิ่มเหตุผลที่ไม่อนุมัติ (ถ้ามี)
+    if (status === "ไม่อนุมัติ" && bookingData.reject_reason) {
+      htmlContent += `
+        <p><strong>❌ เหตุผลที่ไม่อนุมัติ:</strong> ${
+          bookingData.reject_reason || "-"
+        }</p>
+        <p><strong>📝 รายละเอียดเพิ่มเติม:</strong> ${
+          bookingData.detail_reject_reason || "-"
+        }</p>
+      `;
+    }
+
+    htmlContent += `
+        <hr/>
+        <h6 class="fw-bold">ข้อมูลผู้จอง</h6>
+        <p><strong>รหัสนิสิต / อาจารย์:</strong> ${booking.id}</p>
+        <p><strong>ชื่อ-นามสกุล:</strong> ${booking.name}</p>
+        <p><strong>Email:</strong> ${booking.email}</p>
+        <p><strong>เบอร์ติดต่อ:</strong> ${booking.phone_number}</p>
+        <p><strong>สาขาวิชา:</strong> ${booking.department}</p>
+        <hr/>
+        <h6 class="fw-bold">ข้อมูลผู้จองร่วม</h6>
+    `;
+
+    // กรองผู้ใช้ห้องร่วม
+    const participants = data.filter(
+      (item) => item.requestID === requestID && item.role !== "ผู้ขอใช้"
+    );
+
+    if (participants.length > 0) {
+      htmlContent += `
+        <div class="table-responsive">
+          <table class="table table-bordered table-sm" style="font-size: 14px;">
+            <thead>
+              <tr>
+                <th>ลำดับ</th>
+                <th>รหัสนิสิต</th>
+                <th>ชื่อ-นามสกุล</th>
+                <th>Email</th>
+                <th>สาขาวิชา</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      participants.forEach((p, i) => {
+        htmlContent += `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${p.id}</td>
+            <td>${p.name}</td>
+            <td>${p.email}</td>
+            <td>${p.department}</td>
+          </tr>
+        `;
+      });
+
+      htmlContent += `
+            </tbody>
+          </table>
+        </div>
+      `;
+    } else {
+      htmlContent += "<p>ไม่มีผู้จองร่วม</p>";
+    }
+
+    htmlContent += `
+      <hr/>
+      <p><strong>วัตถุประสงค์:</strong> ${booking.bookingreason}</p>
+      <p><strong>รายละเอียดเพิ่มเติม:</strong> ${bookingRoomDetails}</p>
+      </div>
+    `;
+
+    // แสดง SweetAlert2 แบบปรับแต่ง
+    Swal.fire({
+      title: "รายละเอียดการจองห้อง",
+      html: htmlContent,
+      width: 700,
+      confirmButtonText: "ปิด",
+      customClass: {
+        popup: "my-swal-popup",
+        confirmButton: "btn btn-secondary",
+      },
+      buttonsStyling: false,
+      showCloseButton: true,
+      heightAuto: false,
+      backdrop: true,
+    });
+  } catch (error) {
+    console.error("❌ เกิดข้อผิดพลาดในการโหลดข้อมูล:", error);
+    Swal.fire({
+      icon: "error",
+      title: "เกิดข้อผิดพลาด",
+      text: "ไม่สามารถโหลดข้อมูลรายละเอียดได้",
+      confirmButtonText: "ตกลง",
+    });
+  }
+}
+
+// ฟังก์ชันช่วยสำหรับกำหนดสีของสถานะ
+function getStatusColor(statusText) {
+  statusText = statusText.trim();
+  if (statusText === "อนุมัติ") {
+    return "green";
+  } else if (statusText === "คำขอหมดอายุ") {
+    return "gray";
+  } else if (statusText === "ไม่อนุมัติ" || statusText === "ยกเลิกการจอง") {
+    return "red";
+  } else if (statusText === "รออนุมัติ" || statusText === "รอดำเนินการ") {
+    return "orange";
+  }
+  return "black";
 }
 
 // เพิ่มการมองเห็นในแต่ละแถวของตาราง รายละเอียดการจอง
@@ -432,4 +636,25 @@ document.addEventListener("DOMContentLoaded", function () {
   fetchUserBookingData();
   fetchUserInfo();
   fetchBrokenEquipments();
+
+  // เพิ่ม event listener หลังจากโหลดข้อมูลเสร็จ
+  document.addEventListener("click", function (event) {
+    // ตรวจสอบว่าคลิกที่รูปภาพในตารางหรือไม่
+    if (event.target.classList.contains("image-preview")) {
+      // หา index จากแถวที่คลิก
+      const row = event.target.closest("tr");
+      const index = Array.from(row.parentNode.children).indexOf(row);
+      // แสดงรายละเอียด
+      showDetails(index, "repair");
+    }
+  });
+  const style = document.createElement("style");
+  style.textContent = `
+    .large-equipment-image {
+      max-width: 100%;
+      max-height: 80vh;
+      object-fit: contain;
+    }
+  `;
+  document.head.appendChild(style);
 });

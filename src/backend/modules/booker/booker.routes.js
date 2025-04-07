@@ -24,6 +24,17 @@ router.get("/computer_management", controller.getComputerManagement);
 router.get("/getEquipments", controller.getEquipments);
 router.get("/getEquipmentInformation", controller.getEquipmentInformation);
 router.post("/submitBookingIntime", controller.submitBookingIntime);
+router.get("/getBrokenEquipments", controller.getBrokenEquipments);
+router.get("/data/student", controller.getStudent);
+router.post("/submitBookingOuttime", controller.submitBookingOuttime);
+router.post(
+  "/submitBookingIntimeTeacher",
+  controller.submitBookingIntimeTeacher
+);
+router.post(
+  "/submitBookingOuttimeTeacher",
+  controller.submitBookingOuttimeTeacher
+);
 // เพิ่มได้เรื่อย ๆ
 // ✅ ใส่ multer middleware ให้ route นี้!
 

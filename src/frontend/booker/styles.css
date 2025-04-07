@@ -1,292 +1,608 @@
 body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    line-height: 1.6;
-}
-
-.main-content {
-    margin-left: 0%;
-    margin-top: 5%;
-    margin-bottom: 5%;
-    flex: 1;
-    padding: 20px;
-    padding-top: 2px;
-    background-color: #E8E8E8;
-    border-radius: 10px;
-}
-
-.tab-bar {
+  }
+  .header {
+    background-color: #e54715;
+    padding: 15px;
+    color: white;
     display: flex;
-    padding: 10px;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
-}
-
-.tab {
-    padding: 15px 20px;
+  }
+  .header-title {
+    font-size: 25px;
+    font-weight: bold;
+  }
+  .nav {
+    display: flex;
+    gap: 20px;
+  }
+  .nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+  }
+  .nav a:hover {
+    text-decoration: underline;
+  }
+  .nav a.active {
+    font-weight: bold;
+    text-decoration: underline;
+  }
+  .logout-btn {
+    background-color: #5e1d78;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
     cursor: pointer;
-    font-weight: bold;
-    color: #555;
-    text-align: center;
-}
-
-.tab.active {
-    color: #000;
-    border-bottom: 2px solid #000;
-}
-
-.tab-bar button.active {
-    background-color: #f5f5f5;
-    border: 1px solid #ccc;
-    font-weight: bold;
-}
-
-table {
+    font-size: 14px;
+  }
+  .logout-btn:hover {
+    background-color: #4b1561;
+  }
+  .user-info {
+    background-color: #ffffff;
+    margin: 0;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 330px;
+    max-width: 500px;
+    flex-shrink: 0;
+  }
+  .user-avatar {
+    font-size: 50px;
+    margin-right: 20px;
+  }
+  .user-details div {
+    margin-bottom: 8px;
+  }
+  .booking-section {
+    background-color: #8e44ad;
+    color: white;
+    margin: 5px 0;
+    padding: 20px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+  }
+  .booking-section h3 {
+    margin-top: 0;
+    font-size: 20px;
+  }
+  table {
     width: 100%;
     border-collapse: collapse;
-}
-
-td, th {
-    vertical-align: middle; 
-    text-align: center; 
-    padding: 10px;
-    height: 69px;
-    border-bottom: 1px solid #ddd;
-}
-
-/* tr:nth-child(even) {
-    background-color: #f44336;
-} */
-
-.actions {
-    display: flex;
-    gap: 10px;
-}
-
-.actions button {
-    padding: 5px 10px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.actions button:hover {
-    opacity: 0.9;
-    transform: scale(1.04);
-}
-
-.actions2 {
-    text-align: center;
-    gap: 10px;
-}
-
-.actions2 button {
-    padding: 5px 10px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.approve {
-    background-color: #4caf50;
-    color: white;
-}
-
-.reject {
-    background-color: #FF0606;
-    color: white;
-}
-
-.icon-button {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.receive {
-    justify-content: center;
-}
-
-.tab a {
-    text-decoration: none; 
-    color: inherit; 
-}
-
-/* Drop-Downเรียงข้อมูล */
-.dropdown-container {
-    display: inline-block;
-    position: relative;
-    font-family: Arial, sans-serif;
-    margin-left: auto;
-}
-select {
-    width: 135px;
-    padding: 10px;
-    font-size: 14px;
-    color: #7E7E7E;
-    border: 1px solid #E7E7E7;
-    border-radius: 8px;
-    background-color: #F9FBFF;
-    outline: none;
-    cursor: pointer;
-}
-
-select:focus {
-    border-color: #aaa;
-}
-
-/* Drop-Downวันที่ */
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
- 
-.dropdown-symbol {
-    font-size: 16px;
-    color: gray;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-}
- 
-.dropdown-symbol span {
-    margin-right: 5px;
-}
- 
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    margin-top: 5px;
     background-color: white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    overflow: hidden;
-    z-index: 10;
-}
- 
-.dropdown-menu.active {
-    display: block;
-}
-
-header {
-    background-color: #d9c1ab;
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    border-bottom: 2px solid #000;
-  }
-  
-  .floor-buttons {
-    display: flex;
-    gap: 15px;
-  }
-  
-  .report-buttons {
-    display: flex;
-    gap: 15px;
-    margin-left: auto; /* Push this container to the right */
-  }
-  
-  .logout-button {
-    margin-left: 15px; /* Add some spacing between the report buttons and the logout button */
-  }
-  
-  .floor-buttons button {
-    background-color: #6c34a3;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  
-  .floor-buttons button:hover {
-    background-color: #563080;
-  }
-  
-  .floor-buttons button:active {
-    box-shadow: inset 0px 4px 6px rgba(0, 0, 0, 0.4);
-  }
-  
-  .report-buttons button {
-    background-color: rgb(37, 196, 37);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  
-  .report-buttons button:hover {
-    background-color: rgb(30, 170, 30);
-  }
-  
-  .report-buttons button:active {
-    box-shadow: inset 0px 4px 6px rgba(0, 0, 0, 0.4);
-  }
-  
-  .logout-button button {
-    background-color: orange;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  
-  .logout-button button:hover {
-    background-color: rgb(179, 117, 0);
-  }
-  
-  .logout-button button:active {
-    box-shadow: inset 0px 4px 6px rgba(0, 0, 0, 0.4);
-  }
-table td.checked {
-    background-color: #c8e6c9;  /* สีเขียวสำหรับห้องที่มีเรียน */
-    font-weight: bold;
-    color: green;
-}
-
-table td.highlight {
-    background-color: #ffeb3b;  /* สีเหลืองสำหรับห้องที่ไม่ว่าง */
-    font-weight: bold;
     color: black;
-}
-/* 🔹 สไตล์ dropdown */
-.dropdown-list {
-    position: absolute;
-    width: 100%;
-    background: white;
-    border: 1px solid #ccc;
-    max-height: 150px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  table th,
+  table td {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid black;
+  }
+  table th {
+    background-color: #dcdde1;
+    color: #2c3e50;
+    z-index: 2;
+    position: sticky;
+    top: 0;
+  }
+  table tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  .table-container {
+    max-height: 400px;
     overflow-y: auto;
-    display: none;
-    z-index: 1000;
-}
-
-/* 🔹 สไตล์ตัวเลือก */
-/* 🔹 ปรับขนาดตัวอักษรของ dropdown-item */
-.dropdown-item {
-    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  .status {
+    color: green;
+    font-weight: bold;
+  }
+  .cancel-btn {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 18px; /* ✅ ทำให้ตัวหนังสือใหญ่ขึ้น */
-    font-weight: bold; /* ✅ ทำให้ตัวหนังสือหนาขึ้น */
-    transition: background 0.2s;
-    border-bottom: 1px solid #eee;
-}
+  }
+  .cancel-btn:hover {
+    background-color: rgb(255, 90, 90);
+    color: white
+  }
+  /* Modal Styling */
+  #detailsModal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    width: 50%;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    z-index: 1000;
+  }
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+  .modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40%;
+    max-width: 500px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+  }
+  .modal h3 {
+    margin-top: 0;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+  }
+  .close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    color: rgb(0, 0, 0);
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  .close:hover {
+    color: red;
+  }
+  .modal img {
+    width: 100%;
+    max-width: 400px;
+    margin-top: 10px;
+    border-radius: 10px;
+  }
+  .details-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  .details-row {
+    display: flex;
+    justify-content: space-between;
+    background: #f5f5f5;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  #repair-table-body tr {
+    border: 1px solid red !important;
+  }
+  .details-row strong {
+    color: #333;
+  }
+  .detail-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .detail-btn:hover {
+    background-color: #0056b3;
+  }
+  #rejectModal.modal {
+    display: none;
+    position: fixed;
+    top: 12 px;
+    left: 16 px;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px 37px;
+    border-radius: 12px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    width: auto;
+    min-width: 250px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    height: auto;
+  }
+  #rejectModal h3 {
+    margin-top: 0;
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+    color: #333;
+  }
+  #rejectContent {
+    text-align: left;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-top: 15px;
+    color: #444;
+  }
+  #rejectModal .close {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 32px;
+    font-weight: bold;
+    color: #333;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  #rejectModal .close:hover {
+    color: red;
+  }
+  .main-layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    padding: 20px;
+  }
+  .content-sections {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  @media screen and (max-width: 992px) {
+    .main-layout {
+      flex-direction: column;
+    }
+    .user-info {
+      width: 100%;
+      margin-right: 0;
+      margin-bottom: 20px;
+    }
+    .content-sections {
+      width: 100%;
+    }
+  }
+  .menu-toggle {
+    font-size: 24px;
+    background: none;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  .mobile-popup-menu {
+    position: absolute;
+    top: 60px;
+    right: 15px;
+    background-color: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+  }
+  .mobile-popup-menu a {
+    color: #333;
+    text-decoration: none;
+  }
+  .mobile-popup-menu a:hover {
+    text-decoration: underline;
+  }
+  table tbody tr {
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    cursor: pointer;
+  }
+  table tbody tr:hover {
+    background-color: #e9f5ff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  #bookingDetailsModal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    width: 600px;
+    max-width: 90vw;
+    padding: 30px;
+    border-radius: 15px;
+    z-index: 1001;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    color: #333;
+  }
 
-/* 🔹 เมื่อเอาเมาส์ไปชี้จะมี Highlight */
-.dropdown-item:hover,
-.dropdown-item.active {
-    background-color: #b3e5fc; /* ✅ เปลี่ยนสีให้ชัดขึ้น */
-    color: #000;
-    border-radius: 3px;
-}
+  /* สไตล์ปรับแต่ง SweetAlert2 */
+  .my-swal-popup {
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 20px;
+    border-radius: 15px;
+  }
+
+  .my-swal-popup .swal2-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .my-swal-popup table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .my-swal-popup table th,
+  .my-swal-popup table td {
+    padding: 6px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+  }
+
+  .my-swal-popup table th {
+    background-color: #f2f2f2;
+    text-align: center;
+  }
+
+  .my-swal-popup hr {
+    margin: 15px 0;
+    border-color: #eee;
+  }
+
+  .my-swal-popup h6 {
+    font-size: 16px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #e54715;
+  }
+
+  .detail-btn {
+    background-color: #6f3786; /* สีม่วงเข้มตามธีม */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 5px;
+  }
+
+  .detail-btn:hover {
+    background-color: #895a9c; /* สีม่วงอ่อนเมื่อ hover */
+    color: white;
+  }
+  .btn {
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .btn-sm {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+
+  .btn-primary {
+    background-color: #4b1561;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: #5e1d78;
+  }
+
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+
+  .btn-secondary:hover {
+    background-color: #5a6268;
+  }
+
+  .swal2-container {
+    z-index: 10000;
+  }
+
+  .swal2-popup {
+    border-radius: 15px;
+  }
+
+  .swal2-styled.swal2-confirm {
+    background-color: #9445b4;
+    color: white;
+    border-radius: 5px;
+    box-shadow: none;
+  }
+
+  .swal2-styled.swal2-confirm:hover {
+    background-color: #66317a;
+  }
+  /* CSS สำหรับแสดงรายละเอียดการแจ้งซ่อม */
+  .repair-popup {
+    padding: 20px;
+  }
+
+  .repair-details-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 15px;
+  }
+
+  .image-container {
+    text-align: center;
+    width: 100%;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .repair-image {
+    width: 100%;
+    max-width: 500px;
+    height: 300px;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+  }
+
+  .image-caption {
+    margin-top: 10px;
+    font-style: italic;
+    color: #666;
+  }
+
+  .no-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 200px;
+    background-color: #f5f5f5;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+  }
+
+  .no-image-text {
+    color: #999;
+    font-style: italic;
+  }
+
+  .details-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .detail-row {
+    display: flex;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    align-items: flex-start;
+  }
+
+  .detail-label {
+    min-width: 150px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .detail-value {
+    flex: 1;
+    color: #444;
+  }
+
+  /* CSS สำหรับหน้าจอขนาดเล็ก */
+  @media (max-width: 576px) {
+    .repair-details-container {
+      flex-direction: column;
+    }
+
+    .detail-row {
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .detail-label {
+      min-width: auto;
+      width: 100%;
+    }
+  }
+
+  /* ปรับแต่งปุ่มรายละเอียดในตาราง */
+  .repair-detail-btn {
+    background-color: #6f3786;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .repair-detail-btn:hover {
+    background-color: #5e1d78;
+  }
+  /* CSS สำหรับการแสดงรูปภาพในตาราง */
+  .image-preview-container {
+    width: 80px;
+    height: 60px;
+    overflow: hidden;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    background-color: #f8f9fa;
+  }
+
+  .image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+    cursor: pointer;
+  }
+
+  .image-preview:hover {
+    transform: scale(1.1);
+  }
+
+  .no-image-preview {
+    width: 80px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f5f5f5;
+    border: 1px dashed #ccc;
+    border-radius: 5px;
+    color: #999;
+    font-size: 12px;
+    margin: 0 auto;
+  }
+
+  .image-cell {
+    padding: 5px !important;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  /* เมื่อ hover แถวในตาราง */
+  table tbody tr:hover .image-preview-container {
+    border-color: #4b1561;
+    box-shadow: 0 0 5px rgba(94, 29, 120, 0.5);
+  }
