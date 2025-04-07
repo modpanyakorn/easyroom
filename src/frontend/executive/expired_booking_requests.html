@@ -3,18 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Accepted Booking - EasyRoom Reservation System</title>
-    <!-- Bootstrap CSS -->
+    <title>Approval Dashboard</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <!-- Bootstrap Icons -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
       rel="stylesheet"
     />
-    <!-- Font Awesome -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
@@ -82,12 +79,6 @@
       select:focus {
         border-color: #aaa;
       }
-      /* Search Box */
-      #searchBox {
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-      }
       table {
         width: 100%;
         border-collapse: collapse;
@@ -98,16 +89,17 @@
         padding: 10px;
         border-bottom: 1px solid #ddd;
       }
-      .approve {
-        background-color: #4caf50;
-        color: white;
+      @media (max-width: 992px) {
+        .main-content {
+          margin-left: 0;
+          margin-top: 120px;
+        }
       }
-      .reject {
-        background-color: #ff0606;
-        color: white;
-      }
-      .swal2-container {
-        position: absolute !important;
+      /* Search box */
+      #searchBox {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
       }
       #dropdown-calendar {
         display: none;
@@ -117,29 +109,21 @@
         border-radius: 5px;
         padding: 10px;
       }
-      @media (max-width: 992px) {
-        .main-content {
-          margin-left: 0;
-          margin-top: 120px;
-        }
-      }
     </style>
   </head>
   <body>
     <div class="container-fluid">
-      <!-- Sidebar (โหลดจากไฟล์ sidebar.html) -->
       <div id="sidebar-container"></div>
       <div class="main-content">
-        <!-- Tab Bar -->
         <div class="tab-bar">
           <div class="tab"><a href="booking_rooms_requests.html">คำขอ</a></div>
-          <div class="tab active"><a href="#">อนุมัติ</a></div>
+          <div class="tab">
+            <a href="accept_requests_booking_rooms.html">อนุมัติ</a>
+          </div>
           <div class="tab">
             <a href="not_accept_requests_booking_rooms.html">ไม่อนุมัติ</a>
           </div>
-          <div class="tab">
-            <a href="expired_booking_requests.html">คำขอหมดอายุ</a>
-          </div>
+          <div class="tab active"><a href="#">คำขอหมดอายุ</a></div>
           <div class="dropdown-container">
             <!-- Search Box -->
             <input type="text" id="searchBox" placeholder="ค้นหาข้อมูล..." />
@@ -155,38 +139,34 @@
             </select>
           </div>
         </div>
-        <!-- Calendar Dropdown -->
-        <div id="dropdown-calendar">
-          <!-- ส่วนของปฏิทิน (Calendar) สามารถแก้ไขเพิ่มเติมได้ตามที่ต้องการ -->
-        </div>
-        <!-- Data Table -->
+        <!-- Table -->
         <div class="table-responsive">
           <table class="table">
             <thead>
               <tr>
-                <th style="color: #929292">ลำดับ</th>
                 <th style="color: #929292">วันที่</th>
                 <th style="color: #929292">ชื่อ-นามสกุล</th>
                 <th style="color: #929292">ตำแหน่ง</th>
                 <th style="color: #929292">ห้อง</th>
                 <th style="color: #929292">จำนวนนิสิต(คน)</th>
                 <th style="color: #929292">เวลาจอง</th>
-                <th style="color: #929292">ยกเลิกการอนุมัติ</th>
+                <th style="color: #929292">สถานะ</th>
               </tr>
             </thead>
-            <tbody id="reservation-table"></tbody>
+            <tbody id="reservation-table">
+              <!-- Data rows -->
+            </tbody>
           </table>
         </div>
       </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../script/config.js"></script>
     <script src="../script/auth.js"></script>
-    <script src="script/accept_request_booking.js"></script>
-    <!-- โหลด Sidebar -->
+    <script src="script/expired_booking_requests.js"></script>
     <script>
+      // Sidebar
       fetch("sidebar.html")
         .then((resp) => resp.text())
         .then((html) => {
