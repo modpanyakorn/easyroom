@@ -1,5 +1,21 @@
 const API_URL = "http://localhost:3000"; 
 
+async function getCurrentAdmin() {
+    try {
+        const res = await fetch(`${API_URL}/auth/session`, {
+            credentials: "include",
+        });
+
+        if (!res.ok) throw new Error("ไม่สามารถตรวจสอบ session ได้");
+
+        const data = await res.json();
+        return data.data.admin_id;
+    } catch (err) {
+        console.error("❌ ไม่สามารถดึง session admin:", err);
+        return null;
+    }
+}
+
 async function fetchRoom() {
     try {
         // Fetch data from APIs
@@ -137,10 +153,9 @@ async function fetchRoom() {
                     <td class="text-center">${row.roomN}</td>
                     <td class="text-center">${row.participantCount} คน</td>
                     <td class="text-center">
-                                ${formatThaiShortDate(row.used_date)}<br>
-                                ${row.start_time.slice(0, 5)} - ${row.end_time.slice(0, 5)}<br>
-                                (${row.request_type})
-                            </td>
+                        ${formatThaiShortDate(row.used_date)}<br>
+                        ${row.start_time.slice(0, 5)} - ${row.end_time.slice(0, 5)}<br>
+                        (${row.request_type})
                     </td>
                     <td class="text-center">
                         <button class="btn btn-primary btn-sm detail-btn" 
@@ -161,16 +176,78 @@ async function fetchRoom() {
                             data-approvedby="${row.approved_by_name}"
                             data-approvedby_ex="${row.approved_by_ex}">
                             แสดงรายละเอียด
-                        </button><br>
+                        </button>
                     </td>
                     <td class="text-center">${row.request_reason || '-'}</td>
-                    <td class="text-center">${row.request_status || '-'}</td>
+                    <td class="text-center">
+                        ${
+                            row.request_status === "อนุมัติ"
+                            ? `<button class="btn btn-danger btn-sm reject-btn" data-request-id="${row.room_request_id}">ไม่อนุมัติ</button>`
+                            : (row.request_status || '-')
+                        }
+                    </td>
                 </tr>
             `;
         });
-
     } catch (error) {
         console.error('❌ Error fetching data:', error);
+    }
+    bindRejectButtons();
+}
+
+function bindRejectButtons() {
+    const rejectButtons = document.querySelectorAll(".reject-btn");
+    rejectButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const requestId = btn.getAttribute("data-request-id");
+            console.log("กดปุ่มไม่อนุมัติแล้ว requestId:", requestId); // DEBUG
+            openRejectModal(requestId);
+        });
+    });
+}
+
+function openRejectModal(requestId) {
+    console.log("เรียก openRejectModal:", requestId); // DEBUG
+    document.getElementById("rejectRequestId").value = requestId;
+
+    // ใช้ Bootstrap Modal API เปิด modal
+    const modal = new bootstrap.Modal(document.getElementById("rejectModal"));
+    modal.show();
+}
+
+async function submitReject() {
+    const requestId = document.getElementById("rejectRequestId").value;
+    const rejectReason = document.getElementById("rejectReason").value;
+    const detailRejectReason = document.getElementById("rejectDetail").value;
+
+    const admin_id = await getCurrentAdmin();
+
+    try {
+        const response = await fetch(`${API_URL}/admin/updateStatus`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+                requestId,
+                status: "ไม่อนุมัติ",
+                rejectReason,
+                detailRejectReason,
+                admin_id
+            }),
+        });
+
+        if (response.ok) {
+            alert("ปฏิเสธคำขอเรียบร้อย!");
+            fetchRoom();
+            bootstrap.Modal.getInstance(document.getElementById("rejectModal")).hide();
+        } else {
+            const error = await response.json();
+            console.error("❌ Error:", error.message);
+            alert("เกิดข้อผิดพลาดในการอัปเดตสถานะ");
+        }
+    } catch (error) {
+        console.error("❌ Error updating status:", error);
+        alert("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้");
     }
 }
 
