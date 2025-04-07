@@ -473,7 +473,7 @@ async function submitRejection(
   detail_reject_reason = detail_reject_reason || null;
 
   Swal.fire({
-    title: "ยืนยันที่จะไม่อนุมัติการจองห้อง?",
+    title: "ยืนยันยกเลิกการจอง?",
     text: "โปรดยืนยันว่าคุณต้องการไม่อนุมัติคำขอนี้",
     icon: "warning",
     showCancelButton: true,
