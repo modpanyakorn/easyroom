@@ -7,7 +7,7 @@ const fs = require("fs");
 const session = require("express-session");
 const http = require("http");
 const { Server } = require("socket.io");
-const cron = require('node-cron');
+const cron = require("node-cron");
 const { autoExpireRequests } = require("./auto_status_expired");
 
 const app = express();
@@ -20,7 +20,8 @@ const io = new Server(server, {
   },
 });
 //Auto update status
-cron.schedule("*/1 * * * *", async () => {//ปรับเวลาตรงนี้นะ :)
+cron.schedule("*/30 * * * * *", async () => {
+  //ปรับเวลาตรงนี้นะ :)
   console.log("⏰ Running autoExpireRequests...");
   await autoExpireRequests();
 });
@@ -62,7 +63,7 @@ app.use("/storage/equipment_img", express.static(uploadDir));
 app.use("/auth", require("./core/auth/auth.routes"));
 app.use("/booker", require("./modules/booker/booker.routes"));
 app.use("/admin", require("./modules/admin/admin.routes"));
-app.use("/executive" ,require("./modules/executive/executive.routes"));
+app.use("/executive", require("./modules/executive/executive.routes"));
 // list endpoints
 console.log("📚 API Endpoints:");
 console.table(listEndpoints(app));
