@@ -1,6 +1,8 @@
 // ฟังก์ชันช่วยสำหรับรวมข้อความในแต่ละแถว (ใช้สำหรับค้นหา)
 function getRowText(row) {
   return (
+    row.room_request_id + // เพิ่มบรรทัดนี้
+    " " +
     new Date(row.submitted_time).toLocaleDateString("th") +
     " " +
     row.full_name +
@@ -11,7 +13,7 @@ function getRowText(row) {
     " " +
     row.participantCount +
     " " +
-    row.used_date +
+    new Date(row.used_date).toLocaleDateString("th") +
     " " +
     row.start_time +
     " " +

@@ -103,6 +103,8 @@ function renderCustomCalendar() {
 // Helper functionสำหรับรวมข้อความในแต่ละแถวเพื่อค้นหา
 function getRowText(row) {
   return (
+    row.room_request_id + // เพิ่มบรรทัดนี้
+    " " +
     new Date(row.submitted_time).toLocaleDateString("th") +
     " " +
     row.full_name +
@@ -113,7 +115,7 @@ function getRowText(row) {
     " " +
     row.participantCount +
     " " +
-    row.used_date +
+    new Date(row.used_date).toLocaleDateString("th") +
     " " +
     row.start_time +
     " " +
@@ -249,7 +251,7 @@ async function fetchData() {
       } else {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td class="text-center">${r.room_request_id}</td>
+            <td class="text-center">${r.room_request_id}</td>
             <td class="text-center">${new Date(
               r.submitted_time
             ).toLocaleDateString("th")}</td>

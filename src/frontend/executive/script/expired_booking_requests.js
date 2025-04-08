@@ -99,6 +99,8 @@ function renderCustomCalendar() {
 
 function getRowText(row) {
   return (
+    row.room_request_id + // เพิ่มบรรทัดนี้
+    " " +
     new Date(row.submitted_time).toLocaleDateString("th") +
     " " +
     row.full_name +
@@ -109,7 +111,7 @@ function getRowText(row) {
     " " +
     row.participantCount +
     " " +
-    row.used_date +
+    new Date(row.used_date).toLocaleDateString("th") +
     " " +
     row.start_time +
     " " +
@@ -118,6 +120,7 @@ function getRowText(row) {
     row.request_type
   ).toLowerCase();
 }
+
 function getDayOfWeek(dateString) {
   const days = ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."];
   return days[new Date(dateString).getDay()];
@@ -135,7 +138,10 @@ async function fetchData() {
     const teacherData = await teacherRes.json();
     const partData = await partRes.json();
     let data = roomsData
-      .filter((r) => r.request_status === "คำขอหมดอายุ")
+      .filter(
+        (r) =>
+          r.request_status === "คำขอหมดอายุ" && r.request_type === "นอกเวลา"
+      )
       .map((r) => {
         const stu =
           studentsData.find((s) => s.student_id === r.student_id) || {};
@@ -220,6 +226,7 @@ async function fetchData() {
       } else {
         const tr = document.createElement("tr");
         tr.innerHTML = `
+            <td class="text-center">${r.room_request_id}</td>
             <td class="text-center">${new Date(
               r.submitted_time
             ).toLocaleDateString("th")}</td>
