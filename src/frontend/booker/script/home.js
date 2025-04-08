@@ -165,11 +165,6 @@ async function fetchBrokenEquipments() {
         statusColor = "red"; // สีสำหรับสถานะไม่สามารถซ่อมได้
       }
 
-      // แสดงรูปภาพขนาดเล็กในตาราง (ถ้ามี)
-      const imagePreview = item.image_path
-        ? `<div class="image-preview-container"><img src="${API_URL}/booker/image/${item.image_path}" alt="รูปอุปกรณ์" class="image-preview"></div>`
-        : `<div class="no-image-preview">ไม่มีรูป</div>`;
-
       row.innerHTML = `
         <td>${new Date(item.repair_date).toLocaleString("th-TH")}</td>
         <td>${item.equipment_name || "-"}</td>
@@ -209,111 +204,120 @@ function showLargeImage(imageUrl) {
   });
 }
 
-// ฟังก์ชันแสดงรายละเอียดการแจ้งซ่อม
 function showDetails(index, type) {
   if (type === "repair") {
     const item = window.brokenEquipmentsData[index];
     console.log("📌 ข้อมูลที่ดึงมา:", item);
-    if (!item) {
-      console.error("❌ ไม่พบข้อมูลสำหรับ index:", index);
-      Swal.fire({
-        icon: "error",
-        title: "ไม่พบข้อมูล",
-        text: "ไม่สามารถดึงข้อมูลรายละเอียดได้",
-        confirmButtonText: "ตกลง",
-      });
-      return;
+
+    // กำหนด URL ของรูปภาพ
+    let imageUrl = "";
+    if (item.image_path) {
+      // ใช้ฟังก์ชัน fetch แทนการโหลดภาพโดยตรง
+      fetch(`${API_URL}/booker/image/${item.image_path}`)
+        .then((response) => response.blob())
+        .then((blob) => {
+          const objectUrl = URL.createObjectURL(blob);
+
+          // สร้าง HTML สำหรับ SweetAlert2 พร้อมรูปภาพ
+          createAndShowDetailPopup(item, objectUrl);
+        })
+        .catch((error) => {
+          console.error("ไม่สามารถโหลดรูปภาพได้:", error);
+          // แสดง popup โดยไม่มีรูปภาพ
+          createAndShowDetailPopup(item, null);
+        });
+    } else {
+      // กรณีไม่มีรูปภาพ
+      createAndShowDetailPopup(item, null);
     }
+  }
+}
 
-    // กำหนด URL ของรูปภาพ (ถ้ามี)
-    let imageUrl = item.image_path
-      ? `${API_URL}/booker/image/${item.image_path}`
-      : "";
+// ฟังก์ชันสำหรับสร้างและแสดง popup รายละเอียด
+function createAndShowDetailPopup(item, imageUrl) {
+  // กำหนดสีของสถานะซ่อม
+  let statusColor = "black";
+  if (item.repair_status === "รอซ่อม") {
+    statusColor = "#FFBF00";
+  } else if (item.repair_status === "รับเรื่องแล้ว") {
+    statusColor = "green";
+  } else if (
+    item.repair_status === "กำลังจัดซื้อ" ||
+    item.repair_status === "กำลังซ่อม"
+  ) {
+    statusColor = "orange";
+  } else if (item.repair_status === "ซ่อมสำเร็จ") {
+    statusColor = "green";
+  } else if (item.repair_status === "ไม่สามารถซ่อมได้") {
+    statusColor = "red";
+  }
 
-    // กำหนดสีของสถานะซ่อม
-    let statusColor = "black";
-    if (item.repair_status === "รอซ่อม") {
-      statusColor = "#FFBF00";
-    } else if (item.repair_status === "รับเรื่องแล้ว") {
-      statusColor = "green";
-    } else if (
-      item.repair_status === "กำลังจัดซื้อ" ||
-      item.repair_status === "กำลังซ่อม"
-    ) {
-      statusColor = "orange";
-    } else if (item.repair_status === "ซ่อมสำเร็จ") {
-      statusColor = "green";
-    } else if (item.repair_status === "ไม่สามารถซ่อมได้") {
-      statusColor = "red";
-    }
-
-    // สร้าง HTML สำหรับแสดงรายละเอียด
-    let htmlContent = `
-      <div class="repair-details-container">
-        ${
-          imageUrl
-            ? `<div class="image-container">
-                <img src="${imageUrl}" alt="รูปอุปกรณ์ชำรุด" class="repair-image">
-                <div class="image-caption">รูปภาพอุปกรณ์ที่ชำรุด</div>
-              </div>`
-            : `<div class="no-image-container">
-                <div class="no-image-text">ไม่มีรูปภาพ</div>
-              </div>`
-        }
-        
-        <div class="details-section">
-          <div class="detail-row">
-            <div class="detail-label">🖥 ชื่ออุปกรณ์:</div>
-            <div class="detail-value">${item.equipment_name || "-"}</div>
-          </div>
-          <div class="detail-row">
-            <div class="detail-label">🔍 สาเหตุ:</div>
-            <div class="detail-value">${item.damage || "-"}</div>
-          </div>
-          <div class="detail-row">
-            <div class="detail-label">🔍 สาเหตุเพิ่มเติม:</div>
-            <div class="detail-value">${item.damage_details || "-"}</div>
-          </div>
-          <div class="detail-row">
-            <div class="detail-label">📍 ห้อง:</div>
-            <div class="detail-value">SC2-${item.room_id || "-"}</div>
-          </div>
-          <div class="detail-row">
-            <div class="detail-label">⚠️ สถานะ:</div>
-            <div class="detail-value" style="color: ${statusColor}; font-weight: bold;">${
-      item.repair_status || "-"
-    }</div>
-          </div>
-          <div class="detail-row">
-            <div class="detail-label">👤 ผู้รับแจ้งซ่อม:</div>
-            <div class="detail-value">${
-              item.Admin_Name || "รอผู้รับแจ้งซ่อม"
-            }</div>
-          </div>
-          <div class="detail-row">
-            <div class="detail-label">📅 วันที่แจ้งซ่อม:</div>
-            <div class="detail-value">${new Date(
-              item.repair_date
-            ).toLocaleString("th-TH")}</div>
-          </div>
+  // สร้าง HTML สำหรับแสดงรายละเอียด
+  let htmlContent = `
+    <div class="repair-details-container">
+      ${
+        imageUrl
+          ? `<div class="image-container">
+              <img src="${imageUrl}" alt="รูปอุปกรณ์ชำรุด" class="repair-image">
+              <div class="image-caption">รูปภาพอุปกรณ์ที่ชำรุด</div>
+            </div>`
+          : `<div class="no-image-container">
+              <div class="no-image-text">ไม่มีรูปภาพ</div>
+            </div>`
+      }
+      
+      <div class="details-section">
+        <div class="detail-row">
+          <div class="detail-label">🖥 ชื่ออุปกรณ์:</div>
+          <div class="detail-value">${item.equipment_name || "-"}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">🔍 สาเหตุ:</div>
+          <div class="detail-value">${item.damage || "-"}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">🔍 สาเหตุเพิ่มเติม:</div>
+          <div class="detail-value">${item.damage_details || "-"}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">📍 ห้อง:</div>
+          <div class="detail-value">SC2-${item.room_id || "-"}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">⚠️ สถานะ:</div>
+          <div class="detail-value" style="color: ${statusColor}; font-weight: bold;">${
+    item.repair_status || "-"
+  }</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">👤 ผู้รับแจ้งซ่อม:</div>
+          <div class="detail-value">${
+            item.Admin_Name || "รอผู้รับแจ้งซ่อม"
+          }</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">📅 วันที่แจ้งซ่อม:</div>
+          <div class="detail-value">${new Date(item.repair_date).toLocaleString(
+            "th-TH"
+          )}</div>
         </div>
       </div>
-    `;
+    </div>
+  `;
 
-    // แสดง SweetAlert2 แบบปรับแต่ง
-    Swal.fire({
-      title: "รายละเอียดการแจ้งซ่อม",
-      html: htmlContent,
-      width: 800,
-      confirmButtonText: "ปิด",
-      customClass: {
-        popup: "my-swal-popup repair-popup",
-        confirmButton: "btn btn-secondary",
-      },
-      buttonsStyling: false,
-      showCloseButton: true,
-    });
-  }
+  // แสดง SweetAlert2 แบบปรับแต่ง
+  Swal.fire({
+    title: "รายละเอียดการแจ้งซ่อม",
+    html: htmlContent,
+    width: 800,
+    confirmButtonText: "ปิด",
+    customClass: {
+      popup: "my-swal-popup repair-popup",
+      confirmButton: "btn btn-secondary",
+    },
+    buttonsStyling: false,
+    showCloseButton: true,
+  });
 }
 
 function formatDate(isoString) {
