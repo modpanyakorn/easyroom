@@ -426,7 +426,7 @@ async function fetchUserBookingData() {
 async function showBookingDetails(requestID) {
   try {
     // ดึงข้อมูลจาก API
-    const res = await fetch(`${API_URL}/executive/detailsPop`);
+    const res = await fetch(`${API_URL}/booker/detailsPop`);
     if (!res.ok) throw new Error("ไม่สามารถดึงข้อมูลได้");
 
     const data = await res.json();
@@ -454,12 +454,18 @@ async function showBookingDetails(requestID) {
       window.loadedBookingData?.find((b) => b.room_request_id === requestID) ||
       {};
     const status = bookingData.request_status || "-";
+    const utcDate = new Date(booking.datebooking);
+    const thaiTimeBooking = utcDate
+      .toLocaleString("th-TH", {
+        timeZone: "Asia/Bangkok",
+      })
+      .split(" ")[0];
 
     // สร้าง HTML สำหรับ SweetAlert2
     let htmlContent = `
       <div class="text-start">
         <p><strong>📍 ห้องที่จอง:</strong> ${booking.roombooking}</p>
-        <p><strong>🕒 เวลาที่ใช้ห้อง:</strong> ${booking.timebooking}</p>
+        <p><strong>🕒 วันที่ใช้ห้อง:</strong> ${`${thaiTimeBooking}, ${booking.timebooking}`}</p>
         <p><strong>📊 สถานะ:</strong> <span style="color: ${getStatusColor(
           status
         )};">${status}</span></p>

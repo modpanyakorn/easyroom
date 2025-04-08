@@ -35,6 +35,7 @@ router.post(
   "/submitBookingOuttimeTeacher",
   controller.submitBookingOuttimeTeacher
 );
+router.get("/detailsPop", controller.detailsPop);
 // เพิ่มได้เรื่อย ๆ
 // ✅ ใส่ multer middleware ให้ route นี้!
 
