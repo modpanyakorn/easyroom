@@ -336,19 +336,66 @@ exports.equipment = async (req, res) => {
 };
 exports.getImage = async (req, res) => {
   const filename = req.params.filename;
-  const filePath = path.join(
-    __dirname,
-    "../../storage/equipment_img",
-    filename
-  );
+  let filePath = path.join(__dirname, "../../storage/equipment_img", filename);
 
-  if (fs.existsSync(filePath)) {
-    res.setHeader("Content-Type", "image/jpeg");
-    res.sendFile(filePath);
-  } else {
-    res.status(404).json({ error: "File not found" });
+  console.log(`🔍 กำลังดึงรูปภาพ: ${filename}`);
+
+  // ถ้าไม่พบไฟล์ตามชื่อที่ส่งมา ลองเปลี่ยนนามสกุลไฟล์
+  if (!fs.existsSync(filePath)) {
+    // ถ้าเป็น .jpg ลองเปลี่ยนเป็น .png
+    if (filename.endsWith(".jpg")) {
+      const pngFilename = filename.replace(".jpg", ".png");
+      const pngFilePath = path.join(
+        __dirname,
+        "../../storage/equipment_img",
+        pngFilename
+      );
+      console.log(`🔍 ไม่พบไฟล์ .jpg ลองหาไฟล์ .png: ${pngFilename}`);
+
+      if (fs.existsSync(pngFilePath)) {
+        console.log(`✅ พบไฟล์ .png`);
+        filePath = pngFilePath;
+        res.setHeader("Content-Type", "image/png");
+        return res.sendFile(pngFilePath);
+      }
+    }
+    // ถ้าเป็น .png ลองเปลี่ยนเป็น .jpg
+    else if (filename.endsWith(".png")) {
+      const jpgFilename = filename.replace(".png", ".jpg");
+      const jpgFilePath = path.join(
+        __dirname,
+        "../../storage/equipment_img",
+        jpgFilename
+      );
+      console.log(`🔍 ไม่พบไฟล์ .png ลองหาไฟล์ .jpg: ${jpgFilename}`);
+
+      if (fs.existsSync(jpgFilePath)) {
+        console.log(`✅ พบไฟล์ .jpg`);
+        filePath = jpgFilePath;
+        res.setHeader("Content-Type", "image/jpeg");
+        return res.sendFile(jpgFilePath);
+      }
+    }
+
+    console.log("❌ ไม่พบไฟล์ทั้ง .jpg และ .png");
+    return res.status(404).json({ error: "File not found" });
   }
+
+  // กรณีที่พบไฟล์
+  const ext = path.extname(filePath).toLowerCase();
+  if (ext === ".png") {
+    res.setHeader("Content-Type", "image/png");
+  } else if (ext === ".jpg" || ext === ".jpeg") {
+    res.setHeader("Content-Type", "image/jpeg");
+  } else if (ext === ".gif") {
+    res.setHeader("Content-Type", "image/gif");
+  } else {
+    res.setHeader("Content-Type", "application/octet-stream");
+  }
+
+  res.sendFile(filePath);
 };
+
 exports.room_request_participant = async (req, res) => {
   connection.query("SELECT * FROM room_request_participant", (err, results) => {
     if (err) {
