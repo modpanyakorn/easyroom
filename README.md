@@ -35,7 +35,7 @@ for Docker Container Service we set directory path frontend deployment to `src/f
 
 Example: "Open Login Page"
 
-```base
+```bash
 localhost:5501
 ```
 
