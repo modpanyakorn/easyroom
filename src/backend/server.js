@@ -21,7 +21,6 @@ const io = new Server(server, {
 });
 //Auto update status
 cron.schedule("*/30 * * * * *", async () => {
-  //ปรับเวลาตรงนี้นะ :)
   console.log("⏰ Running autoExpireRequests...");
   await autoExpireRequests();
 });
@@ -51,12 +50,12 @@ app.use(
   })
 );
 
-// โฟลเดอร์เก็บรูป
+// Image directory
 const uploadDir = path.join(__dirname, "./storage/equipment_img");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
-// ให้ Express ให้บริการไฟล์รูปแบบ Static
+// Express Serve Static Files
 app.use("/storage/equipment_img", express.static(uploadDir));
 
 // Routes
