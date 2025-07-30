@@ -10,7 +10,7 @@ end_date   = datetime.date(2025, 8, 31)
 submit_start_date = datetime.date(2025, 3, 1)
 submit_end_date   = datetime.date(2025, 8, 31)
 ```
-output here \n
+output here <br>
 Insert the `room_request` table first! Because `primary key` from `room_requst` table is related to other tables.
 - `room_request_inserts.sql` insert at `room_request` table
 - `room_request_computer_insert.sql` insert at `room_request_computer` table
