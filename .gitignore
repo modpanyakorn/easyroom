@@ -2,3 +2,4 @@ src/backend/node_modules
 easyroom.sql
 .env
 src/backend/.env
+src/backend/certificate
