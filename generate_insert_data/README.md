@@ -1,7 +1,6 @@
 # Generate Data
-## For generate insert data
 #### Configure datetime for generate booking requests.
-
+in `gen.py`
 ```python
 # กำหนดช่วงวันที่สำหรับการใช้ห้อง!!
 start_date = datetime.date(2025, 3, 1)
