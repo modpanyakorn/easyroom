@@ -1,4 +1,5 @@
 const mysql = require("mysql2");
+const fs = require("fs");
 require("dotenv").config(); // โหลดค่าจาก .env
 
 const connection = mysql.createConnection({
@@ -7,7 +8,11 @@ const connection = mysql.createConnection({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DBNAME,
   port: process.env.DB_PORT,
-  ssl: process.env.SSL_CA === "true" ? { rejectUnauthorized: true } : false, // ปิด SSL ถ้าไม่ได้ใช้
+  ssl: {
+    ca: fs.readFileSync(process.env.DB_CA_CERT_PATH).toString(),
+    require: true, // บังคับใช้ SSL/TLS (ค่า default ใน Aiven มักจะตั้งให้เป็น require)
+    rejectUnauthorized: true, // ค่า default คือ true, บังคับตรวจสอบใบรับรอง
+  },
 });
 
 // ตรวจสอบการเชื่อมต่อ
